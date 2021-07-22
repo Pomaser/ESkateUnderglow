@@ -16,11 +16,12 @@ APA102<dataPin2, clockPin2> ledStrip2;
 
 #define LED_COUNT 22
 
+// create buffers for both strips
 rgb_color buffer1[LED_COUNT];
 rgb_color buffer2[LED_COUNT];
 
-// set the brightness (max 31)
-const uint8_t GLOBAL_BRIGHTNESS = 15;
+// init variables
+const uint8_t GLOBAL_BRIGHTNESS = 10;
 int positionIdx = 0;
 int loopCnt = 0;
 bool loopPulse = false;
@@ -30,6 +31,8 @@ bool flipFlop = false;
 byte step = 0;
 int flashCounter = 0;
 int transitionCounter = 0;
+int intensity = 0;
+bool intensityUp = false;
 
 
 // initialization stuff
@@ -44,7 +47,10 @@ void setup()
 void loop()
 {
   //knightScanner(14, 15);
-  policeLights(25);
+  //policeLights(25);
+  breathEffect(25);
+  //fillStrip(1, 0, 22, 255, 255, 255);
+  //fillStrip(2, 0, 22, 255, 255, 255);
   ledStrip1.write(buffer1, LED_COUNT, GLOBAL_BRIGHTNESS);
   ledStrip2.write(buffer2, LED_COUNT, GLOBAL_BRIGHTNESS); 
 }
@@ -122,6 +128,7 @@ void policeLights(int loopMax) {
 
   // init
   const int FLASH_COUNT = 8;
+  const int TRANSITION_COUNT = 10;
   
   loopCounter(loopMax);
 
@@ -162,7 +169,7 @@ void policeLights(int loopMax) {
     // next step
     if ( flashCounter == FLASH_COUNT ) {
       flashCounter = 0;
-      if (transitionCounter == 10) {
+      if (transitionCounter == TRANSITION_COUNT) {
         transitionCounter = 0;
         step = 2;
       } else {
@@ -210,7 +217,7 @@ void policeLights(int loopMax) {
     // next step
     if ( flashCounter == FLASH_COUNT ) {
       flashCounter = 0;
-      if (transitionCounter == 10) {
+      if (transitionCounter == TRANSITION_COUNT) {
         transitionCounter = 0;
         step = 0;
       } else {
@@ -228,12 +235,44 @@ void policeLights(int loopMax) {
 }
 
 
-void roller(int loopMax) {
-;
+void breathEffect(int loopMax) {
+
+  const int MIN_INTESNSITY = 10;
+  const int MAX_INTESNSITY = 80;
+
+  // count loops
+  loopCounter(loopMax);
+
+
+  // increase intensity
+  if ( intensityUp == false ) {
+    if ( intensity < MAX_INTESNSITY ) {
+      if ( loopPulse == true ) {
+        fillStrip(1, 0, LED_COUNT, intensity, 0, intensity);
+        fillStrip(2, 0, LED_COUNT, intensity, 0, intensity);
+        intensity=intensity + 2;
+      }
+    } else {
+      intensityUp = not intensityUp;
+    }
+  } else {
+    if ( intensity > MIN_INTESNSITY ) {
+      if ( loopPulse == true ) {
+        fillStrip(1, 0, LED_COUNT, intensity, 0, intensity);
+        fillStrip(2, 0, LED_COUNT, intensity, 0, intensity);
+        intensity=intensity - 2;
+      }
+    } else {
+      intensityUp = not intensityUp;
+    } 
+  }
+  
+    
 }
 
+
 // fill strip with color
-void fillStrip(byte stripNo, int from, int to, byte r, byte g, byte b)
+void fillStrip(byte stripNo, int from, int to, uint8_t r, uint8_t g, uint8_t b)
 {
   for (int i=from; i < to;i++) {
 
