@@ -65,6 +65,7 @@ void strobe(int loopDelay, rgb_color color) {
   // count loops
   loopCounter(loopDelay);
 
+  // wait for timer
   if (loopPulse==false) {
 
     // on/off
@@ -75,7 +76,6 @@ void strobe(int loopDelay, rgb_color color) {
       fillStrip(1, 0, LED_COUNT, 0, 0, 0);
       fillStrip(2, 0, LED_COUNT, 0, 0, 0);
     }
-
   }
 }
   
