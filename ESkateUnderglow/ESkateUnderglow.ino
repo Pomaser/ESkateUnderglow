@@ -46,16 +46,99 @@ void setup()
 // main loop
 void loop()
 {
-  //knightScanner(14, 15);
+  //strobe(20, rgb_color(200,200,200));
+  //rainbow(15, 10);
+  knightScanner(14, 15);
   //policeLights(25);
-  breathEffect(25);
+  //breathEffect(25);
   //fillStrip(1, 0, 22, 255, 255, 255);
   //fillStrip(2, 0, 22, 255, 255, 255);
+
+  // write to outputs
   ledStrip1.write(buffer1, LED_COUNT, GLOBAL_BRIGHTNESS);
   ledStrip2.write(buffer2, LED_COUNT, GLOBAL_BRIGHTNESS); 
 }
 
-// Knigh rider scanner effect
+
+void strobe(int loopDelay, rgb_color color) {
+
+  // count loops
+  loopCounter(loopDelay);
+
+  if (loopPulse==false) {
+
+    // on/off
+    if (flipFlop==false) {
+      fillStrip(1, 0, LED_COUNT, color.red, color.green, color.blue);
+      fillStrip(2, 0, LED_COUNT, color.red, color.green, color.blue);
+    } else {
+      fillStrip(1, 0, LED_COUNT, 0, 0, 0);
+      fillStrip(2, 0, LED_COUNT, 0, 0, 0);
+    }
+
+  }
+}
+  
+
+
+// rainbow effect
+void rainbow(int loopDelay, byte colorLen) {
+  
+  // count loops
+  loopCounter(loopDelay);
+
+  // write effect
+  if (loopPulse == true) {
+
+    // set color
+    switch (step) {
+      case 0:
+        buffer1[0] = rgb_color(148, 0, 211); // violet
+      break;
+      case 1:
+        buffer1[0] = rgb_color(75, 0, 130);  // indigo
+      break;
+      case 2:
+        buffer1[0] = rgb_color(0, 0, 255);   // blue
+      break;
+      case 3:
+        buffer1[0] = rgb_color(0, 255, 0); // green
+      break;  
+      case 4:
+        buffer1[0] = rgb_color(255, 255, 0); // yellow
+      break;
+      case 5:
+        buffer1[0] = rgb_color(255, 127, 0); // orange
+      break;    
+      case 6:
+        buffer1[0] = rgb_color(255, 0, 0); // magenta
+      break;    
+      default:
+        step=0;
+      break;
+    }
+
+    // change color
+    colorLen = constrain(1, colorLen, LED_COUNT-1);
+    if ( transitionCounter < colorLen ) {
+      transitionCounter++;
+    }
+    else {
+      step++;
+      transitionCounter = 0;
+    }
+    
+    // shift whole array
+    for (int idx=LED_COUNT-1; idx > 0; idx--) {
+      buffer1[idx] = buffer1[idx-1];
+    }
+
+    // copy to second buffer
+    memcpy(buffer2, buffer1, sizeof(buffer2));
+  }
+}
+
+// Knight rider scanner effect
 void knightScanner(int beamLen, int loopMax)
 {
 
