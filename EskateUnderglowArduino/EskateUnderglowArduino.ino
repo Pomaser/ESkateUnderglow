@@ -22,24 +22,26 @@ APA102<PIN2_DATA, PIN2_CLOCK> ledStrip2;
 rgb_color buffer1[LED_COUNT];
 rgb_color buffer2[LED_COUNT];
 
-// init variables
-const uint8_t GLOBAL_BRIGHTNESS = 10;
+// create constants
+const int PATTERN_MAX = 5;
+const int GLOBAL_BRIGHTNESS = 10;
+
+// create variables
+byte step = 0;
 int positionIdx = 0;
 int loopCnt = 0;
-bool loopPulse = false;
-bool positiveDirection = true;
-int first = false;
-bool flipFlop = false;
-byte step = 0;
 int flashCounter = 0;
 int transitionCounter = 0;
 int intensity = 0;
-bool intensityUp = false;
 int buttonState = 0;
 int lastButtonState = 1;
-bool changePattern;
 int patternIdx = 0;
-const int PATTERN_MAX = 5;
+bool loopPulse = false;
+bool positiveDirection = true;
+bool flipFlop = false;
+bool intensityUp = false;
+bool changePattern;
+
 
 // initialization stuff
 void setup()
@@ -49,7 +51,6 @@ void setup()
   pinMode(LED_BUILTIN, OUTPUT);
   fillStrip(1, 0, 22, 0, 0, 0);
   fillStrip(2, 0, 22, 0, 0, 0);
-  first = false;
   delay(40);  // give pull-ups time raise the input voltage
 }
 
@@ -142,7 +143,6 @@ void strobe(int loopDelay, rgb_color color) {
 }
   
 
-
 // rainbow effect
 void rainbow(int loopDelay, byte colorLen) {
   
@@ -199,6 +199,7 @@ void rainbow(int loopDelay, byte colorLen) {
     memcpy(buffer2, buffer1, sizeof(buffer2));
   }
 }
+
 
 // Knight rider scanner effect
 void knightScanner(int beamLen, int loopMax)
@@ -267,6 +268,7 @@ void knightScanner(int beamLen, int loopMax)
   }
 
 }
+
 
 // police lights 
 void policeLights(int loopMax) {
