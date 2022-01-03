@@ -2,7 +2,6 @@
 #include <FastGPIO.h>
 #define APA102_USE_FAST_GPIO
 #include <APA102.h>
-#include <EEPROM.h>
 
 // set pins
 const int PIN1_CLOCK = 9;
@@ -25,6 +24,7 @@ rgb_color buffer2[LED_COUNT];
 // create constants
 const int PATTERN_MAX = 5;
 const int GLOBAL_BRIGHTNESS = 10;
+const int TIMOUT_BUTTON_CYCLES = 500;
 
 // create variables
 byte step = 0;
@@ -36,6 +36,8 @@ int intensity = 0;
 int buttonState = 0;
 int lastButtonState = 1;
 int patternIdx = 0;
+int buttonCounter = 0;
+int buttonTimer = 0;
 bool loopPulse = false;
 bool positiveDirection = true;
 bool flipFlop = false;
@@ -46,12 +48,18 @@ bool changePattern;
 // initialization stuff
 void setup()
 {
+  // set pin modes
   pinMode(PIN_CHANGE_PATTERN, INPUT);
-  pinMode(PIN_CHANGE_PATTERN, INPUT_PULLUP);
+  // pinMode(PIN_CHANGE_PATTERN, INPUT_PULLUP);
   pinMode(LED_BUILTIN, OUTPUT);
+  delay(40);  // give pull-ups time raise the input voltage
+
+  // clear both strips
   fillStrip(1, 0, 22, 0, 0, 0);
   fillStrip(2, 0, 22, 0, 0, 0);
-  delay(40);  // give pull-ups time raise the input voltage
+
+  // read button state for first start
+  lastButtonState = digitalRead(PIN_CHANGE_PATTERN);
 }
 
 // main loop
@@ -60,19 +68,24 @@ void loop()
 
   // read change pattern input
   buttonState = digitalRead(PIN_CHANGE_PATTERN);
+
+  // copy state to output LED
+  if ( buttonState == 1 ) {
+    digitalWrite(LED_BUILTIN, HIGH);
+  } else {
+    digitalWrite(LED_BUILTIN, LOW);
+  }
   
   // compare the buttonState to its previous state
   if (buttonState != lastButtonState) {
    
     // rising edge of button
     if (buttonState == HIGH) {
-      changePattern = true;
-      digitalWrite(LED_BUILTIN, HIGH);
+      buttonCounter++;
     }
-
+    // falling edge of button
     if (buttonState == LOW ) {
-      changePattern = true;
-      digitalWrite(LED_BUILTIN, LOW);
+      ;   
     }
     // avoid bouncing
     delay(50);
@@ -80,10 +93,34 @@ void loop()
   
   // save the current state as the last state, for next time through the loop
   lastButtonState = buttonState;
-    
+
+  // count cycles
+  if ( buttonCounter > 0 ) {
+    buttonTimer++;
+  }
+   
+  // reset cycle counter
+  if ( buttonTimer > TIMOUT_BUTTON_CYCLES ) {
+    buttonCounter = 0;
+    buttonTimer = 0;
+  }
+
+  // change pattern signal after some presses
+  if (( buttonTimer < TIMOUT_BUTTON_CYCLES ) && ( buttonCounter > 1 )) {
+      changePattern = true;
+      buttonCounter = 0;
+      buttonTimer = 0;
+  }
+  
   // change pattern index
   if (changePattern == true ) {
+    
+    // erase old effect
+    fillStrip(1, 0, 22, 0, 0, 0);
+    fillStrip(2, 0, 22, 0, 0, 0);
     changePattern = false;
+
+    // change pattern
     if (patternIdx < PATTERN_MAX ) {
       patternIdx++;
     } else {
@@ -375,7 +412,6 @@ void policeLights(int loopMax) {
 
     break;        
   default:
-    // statements
     break;
   }
   
@@ -389,7 +425,6 @@ void breathEffect(int loopMax) {
 
   // count loops
   loopCounter(loopMax);
-
 
   // increase intensity
   if ( intensityUp == false ) {
@@ -418,7 +453,7 @@ void breathEffect(int loopMax) {
 }
 
 
-// fill strip with color
+// fill strip with single color
 void fillStrip(byte stripNo, int from, int to, uint8_t r, uint8_t g, uint8_t b)
 {
   for (int i=from; i < to;i++) {
