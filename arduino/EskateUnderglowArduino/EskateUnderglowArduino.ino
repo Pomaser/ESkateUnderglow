@@ -2,6 +2,7 @@
 #include <FastGPIO.h>
 #define APA102_USE_FAST_GPIO
 #include <APA102.h>
+#include <math.h>
 
 // set pins
 const int PIN1_CLOCK = 9;
@@ -417,39 +418,36 @@ void policeLights(int loopMax) {
   
 }
 
-
+// Breath effect with sine
 void breathEffect(int loopMax) {
 
-  const int MIN_INTESNSITY = 10;
-  const int MAX_INTESNSITY = 80;
+  const int MIN_INTENSITY = 10;
+  const int MAX_INTENSITY = 80;
+
+  static uint8_t theta = 0;
 
   // count loops
   loopCounter(loopMax);
 
-  // increase intensity
-  if ( intensityUp == false ) {
-    if ( intensity < MAX_INTESNSITY ) {
-      if ( loopPulse == true ) {
-        fillStrip(1, 0, LED_COUNT, intensity, 0, intensity);
-        fillStrip(2, 0, LED_COUNT, intensity, 0, intensity);
-        intensity=intensity + 2;
-      }
-    } else {
-      intensityUp = not intensityUp;
-    }
-  } else {
-    if ( intensity > MIN_INTESNSITY ) {
-      if ( loopPulse == true ) {
-        fillStrip(1, 0, LED_COUNT, intensity, 0, intensity);
-        fillStrip(2, 0, LED_COUNT, intensity, 0, intensity);
-        intensity=intensity - 2;
-      }
-    } else {
-      intensityUp = not intensityUp;
-    } 
+  // update only on pulse
+  if (loopPulse == true) {
+
+    // advance phase (speed of breathing)
+    theta += 2;
+
+    // convert 0–255 to radians (0–2π)
+    float angle = (theta / 255.0f) * 2.0f * PI;
+
+    // sin() gives -1..1 → map to 0..1
+    float s = (sin(angle) + 1.0f) * 0.5f;
+
+    // map to intensity range
+    int intensity = MIN_INTENSITY +
+                    (int)((MAX_INTENSITY - MIN_INTENSITY) * s);
+
+    fillStrip(1, 0, LED_COUNT, intensity, 0, intensity);
+    fillStrip(2, 0, LED_COUNT, intensity, 0, intensity);
   }
-  
-    
 }
 
 
