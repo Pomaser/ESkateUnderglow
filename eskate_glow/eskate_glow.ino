@@ -1,64 +1,487 @@
-#include <FastLED.h>
+// add libraries
+#include <FastGPIO.h>
+#define APA102_USE_FAST_GPIO
+#include <APA102.h>
+#include <math.h>
 
-// Number of LEDs and APA102 pins
-#define NUM_LEDS 2
-#define DATA_PIN 2
-#define CLOCK_PIN 4
+// set pins
+const int PIN1_CLOCK = 9;
+const int PIN1_DATA = 10;
+const int PIN2_CLOCK = 11;
+const int PIN2_DATA = 12;
+const int PIN_CHANGE_PATTERN = 8;
 
-// LED array
-CRGB leds[NUM_LEDS];
+// create strips
+APA102<PIN1_DATA, PIN1_CLOCK> ledStrip1;
+APA102<PIN2_DATA, PIN2_CLOCK> ledStrip2;
 
-// Brightness range
-const uint8_t BRIGHT_MIN = 50;
-const uint8_t BRIGHT_MAX = 100;
+// set LED count for strip
+#define LED_COUNT 22
 
-// Sine wave phase (0–255 equals 0–360 degrees)
-uint8_t theta = 0;
+// create buffers for both strips
+rgb_color buffer1[LED_COUNT];
+rgb_color buffer2[LED_COUNT];
 
-// Delay before pulsing starts (5 minutes in milliseconds)
-const unsigned long PULSE_DELAY = 5UL * 60UL * 1000UL;
+// create constants
+const int PATTERN_MAX = 5;
+const int GLOBAL_BRIGHTNESS = 10;
+const int TIMOUT_BUTTON_CYCLES = 500;
 
-void setup() {
-  Serial.begin(9600);
-  delay(200);
+// create variables
+byte step = 0;
+int positionIdx = 0;
+int loopCnt = 0;
+int flashCounter = 0;
+int transitionCounter = 0;
+int intensity = 0;
+int buttonState = 0;
+int lastButtonState = 1;
+int patternIdx = 0;
+int buttonCounter = 0;
+int buttonTimer = 0;
+bool loopPulse = false;
+bool positiveDirection = true;
+bool flipFlop = false;
+bool intensityUp = false;
+bool changePattern;
 
-  // Initialize APA102 LEDs
-  FastLED.addLeds<APA102, DATA_PIN, CLOCK_PIN, BGR>(leds, NUM_LEDS);
 
-  // Set initial LED color
-  for (int i = 0; i < NUM_LEDS; i++) {
-    leds[i] = CRGB::Yellow;
-  }
+// initialization stuff
+void setup()
+{
+  // set pin modes
+  pinMode(PIN_CHANGE_PATTERN, INPUT);
+  // pinMode(PIN_CHANGE_PATTERN, INPUT_PULLUP);
+  pinMode(LED_BUILTIN, OUTPUT);
+  delay(40);  // give pull-ups time raise the input voltage
 
-  // Set full brightness at startup
-  FastLED.setBrightness(BRIGHT_MAX);
+  // clear both strips
+  fillStrip(1, 0, 22, 0, 0, 0);
+  fillStrip(2, 0, 22, 0, 0, 0);
 
-  // Send data to LEDs
-  FastLED.show();
+  // read button state for first start
+  lastButtonState = digitalRead(PIN_CHANGE_PATTERN);
 }
 
-void loop() {
-  if (millis() < PULSE_DELAY) {
-    // First 5 minutes: steady full brightness
-    FastLED.setBrightness(BRIGHT_MAX);
-    FastLED.show();
-    delay(10);
+// main loop
+void loop()
+{
+
+  // read change pattern input
+  buttonState = digitalRead(PIN_CHANGE_PATTERN);
+
+  // copy state to output LED
+  if ( buttonState == 1 ) {
+    digitalWrite(LED_BUILTIN, HIGH);
   } else {
-    // After 5 minutes: start pulsing
-    theta++;
-
-    // Generate smooth brightness using sine wave
-    uint8_t brightness = map(
-      sin8(theta),
-      0, 255,
-      BRIGHT_MIN, BRIGHT_MAX
-    );
-
-    // Apply brightness and update LEDs
-    FastLED.setBrightness(brightness);
-    FastLED.show();
-
-    // Control animation speed
-    delay(10);
+    digitalWrite(LED_BUILTIN, LOW);
   }
+  
+  // compare the buttonState to its previous state
+  if (buttonState != lastButtonState) {
+   
+    // rising edge of button
+    if (buttonState == HIGH) {
+      buttonCounter++;
+    }
+    // falling edge of button
+    if (buttonState == LOW ) {
+      ;   
+    }
+    // avoid bouncing
+    delay(50);
+  }
+  
+  // save the current state as the last state, for next time through the loop
+  lastButtonState = buttonState;
+
+  // count cycles
+  if ( buttonCounter > 0 ) {
+    buttonTimer++;
+  }
+   
+  // reset cycle counter
+  if ( buttonTimer > TIMOUT_BUTTON_CYCLES ) {
+    buttonCounter = 0;
+    buttonTimer = 0;
+  }
+
+  // change pattern signal after some presses
+  if (( buttonTimer < TIMOUT_BUTTON_CYCLES ) && ( buttonCounter > 1 )) {
+      changePattern = true;
+      buttonCounter = 0;
+      buttonTimer = 0;
+  }
+  
+  // change pattern index
+  if (changePattern == true ) {
+    
+    // erase old effect
+    fillStrip(1, 0, 22, 0, 0, 0);
+    fillStrip(2, 0, 22, 0, 0, 0);
+    changePattern = false;
+
+    // change pattern
+    if (patternIdx < PATTERN_MAX ) {
+      patternIdx++;
+    } else {
+      patternIdx = 0;
+    }
+  }
+
+  // switch patterns
+  switch (patternIdx) {
+    case 0:
+      fillStrip(1, 0, 22, 0, 0, 0);
+      fillStrip(2, 0, 22, 0, 0, 0);
+      break;
+    case 1:
+      knightScanner(14, 15);
+      break;
+    case 2:
+      policeLights(25);
+      break;      
+    case 3:
+      rainbow(15, 10);
+      break;      
+    case 4:
+      breathEffect(25);
+      break;
+    case 5:
+      strobe(20, rgb_color(200,200,200));  
+      break;
+    default:
+      patternIdx = 0;
+      break;
+  }
+
+  // write to outputs
+  ledStrip1.write(buffer1, LED_COUNT, GLOBAL_BRIGHTNESS);
+  ledStrip2.write(buffer2, LED_COUNT, GLOBAL_BRIGHTNESS); 
+}
+
+
+void strobe(int loopDelay, rgb_color color) {
+
+  // count loops
+  loopCounter(loopDelay);
+
+  // wait for timer
+  if (loopPulse==false) {
+
+    // on/off
+    if (flipFlop==false) {
+      fillStrip(1, 0, LED_COUNT, color.red, color.green, color.blue);
+      fillStrip(2, 0, LED_COUNT, color.red, color.green, color.blue);
+    } else {
+      fillStrip(1, 0, LED_COUNT, 0, 0, 0);
+      fillStrip(2, 0, LED_COUNT, 0, 0, 0);
+    }
+  }
+}
+  
+
+// rainbow effect
+void rainbow(int loopDelay, byte colorLen) {
+  
+  // count loops
+  loopCounter(loopDelay);
+
+  // write effect
+  if (loopPulse == true) {
+
+    // set color
+    switch (step) {
+      case 0:
+        buffer1[0] = rgb_color(148, 0, 211); // violet
+      break;
+      case 1:
+        buffer1[0] = rgb_color(75, 0, 130);  // indigo
+      break;
+      case 2:
+        buffer1[0] = rgb_color(0, 0, 255);   // blue
+      break;
+      case 3:
+        buffer1[0] = rgb_color(0, 255, 0); // green
+      break;  
+      case 4:
+        buffer1[0] = rgb_color(255, 255, 0); // yellow
+      break;
+      case 5:
+        buffer1[0] = rgb_color(255, 127, 0); // orange
+      break;    
+      case 6:
+        buffer1[0] = rgb_color(255, 0, 0); // magenta
+      break;    
+      default:
+        step=0;
+      break;
+    }
+
+    // change color
+    colorLen = constrain(1, colorLen, LED_COUNT-1);
+    if ( transitionCounter < colorLen ) {
+      transitionCounter++;
+    }
+    else {
+      step++;
+      transitionCounter = 0;
+    }
+    
+    // shift whole array
+    for (int idx=LED_COUNT-1; idx > 0; idx--) {
+      buffer1[idx] = buffer1[idx-1];
+    }
+
+    // copy to second buffer
+    memcpy(buffer2, buffer1, sizeof(buffer2));
+  }
+}
+
+
+// Knight rider scanner effect
+void knightScanner(int beamLen, int loopMax)
+{
+
+  // create variables
+  rgb_color beamShape[beamLen];
+  const int BEAM_OFFSET = beamLen - 1;
+
+ 
+  // create beam shape
+  float beamSpread = 255.0 / (beamLen - 1);
+  int beamStep = 0;
+  for (int idx=0; idx < beamLen; idx++) {
+    if ( idx < (beamLen - 1) ) {
+      beamStep = 255 - (idx * beamSpread);
+    }
+    else {
+      beamStep = 0;
+    }
+    beamShape[idx].red = beamStep;
+    beamShape[idx].blue = 0;
+    beamShape[idx].green = 0;
+  }
+
+  // count loops
+  loopCounter(loopMax);
+
+  // move in positive dir
+  if ( (positionIdx < LED_COUNT + BEAM_OFFSET - 1 ) && (positiveDirection == true ) ) {
+    if (loopPulse==true) {positionIdx++;}
+  }
+  else {
+    positiveDirection = false;
+  }
+  
+  // move in negative dir
+  if ( (positionIdx > 0 - BEAM_OFFSET ) && (positiveDirection == false ) ) {
+        if (loopPulse==true) {positionIdx--;}
+  }
+  else {
+    positiveDirection = true;
+  }
+
+  // copy beam to buffer
+  if ( positiveDirection == true ) {
+    for (int idx=0; idx < beamLen; idx++) {
+      int copyPos = positionIdx - idx;
+      
+      // only LEDs in range
+      if ( ( copyPos < LED_COUNT ) && ( copyPos >= 0 ) ) {
+        buffer1[copyPos] = beamShape[idx];
+        buffer2[copyPos] = beamShape[idx];
+      }
+    }    
+  } else {
+    for (int idx=0; idx < beamLen; idx++) {
+      int copyPos = positionIdx + idx;
+      
+      // only LEDs in range
+      if ( ( copyPos < LED_COUNT ) && ( copyPos >= 0 ) ) {
+        buffer1[copyPos] = beamShape[idx];
+        buffer2[copyPos] = beamShape[idx];
+      }
+    }    
+  }
+
+}
+
+
+// police lights 
+void policeLights(int loopMax) {
+
+  // init
+  const int FLASH_COUNT = 8;
+  const int TRANSITION_COUNT = 10;
+  
+  loopCounter(loopMax);
+
+  // switch effects
+  switch (step) {
+
+  // flash RED
+  case 0:
+
+    // one flash
+    if ( flipFlop == true ) {
+      fillStrip(1, 0, LED_COUNT, 255, 0, 0);
+    } else {
+      fillStrip(1, 0, LED_COUNT, 0, 0, 0);
+    }
+
+    // count flashes
+    if ( loopPulse == true ) {flashCounter++;}
+
+    // next step
+    if ( flashCounter == FLASH_COUNT ) {flashCounter = 0; step = 1;}
+    
+    break;
+
+  // flash BLUE
+  case 1:
+
+    // one flash
+    if ( flipFlop == true ) {
+      fillStrip(2, 0, LED_COUNT, 0, 0, 255);
+    } else {
+      fillStrip(2, 0, LED_COUNT, 0, 0, 0);
+    }
+
+    // count flashes
+    if ( loopPulse == true ) {flashCounter++;}
+
+    // next step
+    if ( flashCounter == FLASH_COUNT ) {
+      flashCounter = 0;
+      if (transitionCounter == TRANSITION_COUNT) {
+        transitionCounter = 0;
+        step = 2;
+      } else {
+        transitionCounter++;
+        step = 0;
+      }
+    }
+    
+    break;
+
+  // flash both
+  case 2:
+
+    // one flash
+    if ( flipFlop == true ) {
+      fillStrip(1, 0, 11, 0, 0, 255);
+      fillStrip(2, 0, 11, 0, 0, 255);
+    } else {
+      fillStrip(1, 0, LED_COUNT, 0, 0, 0);
+      fillStrip(2, 0, LED_COUNT, 0, 0, 0);
+    }
+
+    // count flashes
+    if ( loopPulse == true ) {flashCounter++;}
+
+    // next step
+    if ( flashCounter == FLASH_COUNT ) {flashCounter = 0; step = 3;}
+    break;
+
+  // flash both
+  case 3:
+
+    // one flash
+    if ( flipFlop == true ) {
+      fillStrip(1, 12, LED_COUNT, 255, 0, 0);
+      fillStrip(2, 12, LED_COUNT, 255, 0, 0);
+    } else {
+      fillStrip(1, 0, LED_COUNT, 0, 0, 0);
+      fillStrip(2, 0, LED_COUNT, 0, 0, 0);
+    }
+
+    // count flashes
+    if ( loopPulse == true ) {flashCounter++;}
+
+    // next step
+    if ( flashCounter == FLASH_COUNT ) {
+      flashCounter = 0;
+      if (transitionCounter == TRANSITION_COUNT) {
+        transitionCounter = 0;
+        step = 0;
+      } else {
+        transitionCounter++;
+        step = 2;
+      }
+    }
+
+    break;        
+  default:
+    break;
+  }
+  
+}
+
+// Breath effect with sine
+void breathEffect(int loopMax) {
+
+  const int MIN_INTENSITY = 10;
+  const int MAX_INTENSITY = 80;
+
+  static uint8_t theta = 0;
+
+  // count loops
+  loopCounter(loopMax);
+
+  // update only on pulse
+  if (loopPulse == true) {
+
+    // advance phase (speed of breathing)
+    theta += 2;
+
+    // convert 0–255 to radians (0–2π)
+    float angle = (theta / 255.0f) * 2.0f * PI;
+
+    // sin() gives -1..1 → map to 0..1
+    float s = (sin(angle) + 1.0f) * 0.5f;
+
+    // map to intensity range
+    int intensity = MIN_INTENSITY +
+                    (int)((MAX_INTENSITY - MIN_INTENSITY) * s);
+
+    fillStrip(1, 0, LED_COUNT, intensity, 0, intensity);
+    fillStrip(2, 0, LED_COUNT, intensity, 0, intensity);
+  }
+}
+
+
+// fill strip with single color
+void fillStrip(byte stripNo, int from, int to, uint8_t r, uint8_t g, uint8_t b)
+{
+  for (int i=from; i < to;i++) {
+
+    if ( stripNo == 1 ) {
+      buffer1[i].red = r;
+      buffer1[i].green = g;
+      buffer1[i].blue = b;
+    }
+
+    if ( stripNo == 2 ) {
+      buffer2[i].red = r;
+      buffer2[i].green = g;
+      buffer2[i].blue = b;
+    }
+
+  }  
+}
+
+// loop counter
+void loopCounter(int loopMax) {
+  
+  // count loops
+  if ( loopCnt < loopMax ) {
+    loopCnt++;
+    loopPulse = false;
+  } else {
+    loopCnt=0;
+    loopPulse = true;
+    flipFlop = not flipFlop;
+  }
+  
 }
