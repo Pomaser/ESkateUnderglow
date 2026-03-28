@@ -6,322 +6,322 @@
     {
       "type": "wokwi-arduino-nano",
       "id": "nano",
-      "top": 400,
+      "top": 200,
       "left": 20,
       "attrs": {}
     },
     {
       "type": "wokwi-neopixel",
       "id": "s1_0",
-      "top": 20,
+      "top": 80,
       "left": -330,
       "attrs": {}
     },
     {
       "type": "wokwi-neopixel",
       "id": "s2_0",
-      "top": 600,
+      "top": 340,
       "left": -330,
       "attrs": {}
     },
     {
       "type": "wokwi-neopixel",
       "id": "s1_1",
-      "top": 20,
+      "top": 80,
       "left": -300,
       "attrs": {}
     },
     {
       "type": "wokwi-neopixel",
       "id": "s2_1",
-      "top": 600,
+      "top": 340,
       "left": -300,
       "attrs": {}
     },
     {
       "type": "wokwi-neopixel",
       "id": "s1_2",
-      "top": 20,
+      "top": 80,
       "left": -270,
       "attrs": {}
     },
     {
       "type": "wokwi-neopixel",
       "id": "s2_2",
-      "top": 600,
+      "top": 340,
       "left": -270,
       "attrs": {}
     },
     {
       "type": "wokwi-neopixel",
       "id": "s1_3",
-      "top": 20,
+      "top": 80,
       "left": -240,
       "attrs": {}
     },
     {
       "type": "wokwi-neopixel",
       "id": "s2_3",
-      "top": 600,
+      "top": 340,
       "left": -240,
       "attrs": {}
     },
     {
       "type": "wokwi-neopixel",
       "id": "s1_4",
-      "top": 20,
+      "top": 80,
       "left": -210,
       "attrs": {}
     },
     {
       "type": "wokwi-neopixel",
       "id": "s2_4",
-      "top": 600,
+      "top": 340,
       "left": -210,
       "attrs": {}
     },
     {
       "type": "wokwi-neopixel",
       "id": "s1_5",
-      "top": 20,
+      "top": 80,
       "left": -180,
       "attrs": {}
     },
     {
       "type": "wokwi-neopixel",
       "id": "s2_5",
-      "top": 600,
+      "top": 340,
       "left": -180,
       "attrs": {}
     },
     {
       "type": "wokwi-neopixel",
       "id": "s1_6",
-      "top": 20,
+      "top": 80,
       "left": -150,
       "attrs": {}
     },
     {
       "type": "wokwi-neopixel",
       "id": "s2_6",
-      "top": 600,
+      "top": 340,
       "left": -150,
       "attrs": {}
     },
     {
       "type": "wokwi-neopixel",
       "id": "s1_7",
-      "top": 20,
+      "top": 80,
       "left": -120,
       "attrs": {}
     },
     {
       "type": "wokwi-neopixel",
       "id": "s2_7",
-      "top": 600,
+      "top": 340,
       "left": -120,
       "attrs": {}
     },
     {
       "type": "wokwi-neopixel",
       "id": "s1_8",
-      "top": 20,
+      "top": 80,
       "left": -90,
       "attrs": {}
     },
     {
       "type": "wokwi-neopixel",
       "id": "s2_8",
-      "top": 600,
+      "top": 340,
       "left": -90,
       "attrs": {}
     },
     {
       "type": "wokwi-neopixel",
       "id": "s1_9",
-      "top": 20,
+      "top": 80,
       "left": -60,
       "attrs": {}
     },
     {
       "type": "wokwi-neopixel",
       "id": "s2_9",
-      "top": 600,
+      "top": 340,
       "left": -60,
       "attrs": {}
     },
     {
       "type": "wokwi-neopixel",
       "id": "s1_10",
-      "top": 20,
+      "top": 80,
       "left": -30,
       "attrs": {}
     },
     {
       "type": "wokwi-neopixel",
       "id": "s2_10",
-      "top": 600,
+      "top": 340,
       "left": -30,
       "attrs": {}
     },
     {
       "type": "wokwi-neopixel",
       "id": "s1_11",
-      "top": 20,
+      "top": 80,
       "left": 0,
       "attrs": {}
     },
     {
       "type": "wokwi-neopixel",
       "id": "s2_11",
-      "top": 600,
+      "top": 340,
       "left": 0,
       "attrs": {}
     },
     {
       "type": "wokwi-neopixel",
       "id": "s1_12",
-      "top": 20,
+      "top": 80,
       "left": 30,
       "attrs": {}
     },
     {
       "type": "wokwi-neopixel",
       "id": "s2_12",
-      "top": 600,
+      "top": 340,
       "left": 30,
       "attrs": {}
     },
     {
       "type": "wokwi-neopixel",
       "id": "s1_13",
-      "top": 20,
+      "top": 80,
       "left": 60,
       "attrs": {}
     },
     {
       "type": "wokwi-neopixel",
       "id": "s2_13",
-      "top": 600,
+      "top": 340,
       "left": 60,
       "attrs": {}
     },
     {
       "type": "wokwi-neopixel",
       "id": "s1_14",
-      "top": 20,
+      "top": 80,
       "left": 90,
       "attrs": {}
     },
     {
       "type": "wokwi-neopixel",
       "id": "s2_14",
-      "top": 600,
+      "top": 340,
       "left": 90,
       "attrs": {}
     },
     {
       "type": "wokwi-neopixel",
       "id": "s1_15",
-      "top": 20,
+      "top": 80,
       "left": 120,
       "attrs": {}
     },
     {
       "type": "wokwi-neopixel",
       "id": "s2_15",
-      "top": 600,
+      "top": 340,
       "left": 120,
       "attrs": {}
     },
     {
       "type": "wokwi-neopixel",
       "id": "s1_16",
-      "top": 20,
+      "top": 80,
       "left": 150,
       "attrs": {}
     },
     {
       "type": "wokwi-neopixel",
       "id": "s2_16",
-      "top": 600,
+      "top": 340,
       "left": 150,
       "attrs": {}
     },
     {
       "type": "wokwi-neopixel",
       "id": "s1_17",
-      "top": 20,
+      "top": 80,
       "left": 180,
       "attrs": {}
     },
     {
       "type": "wokwi-neopixel",
       "id": "s2_17",
-      "top": 600,
+      "top": 340,
       "left": 180,
       "attrs": {}
     },
     {
       "type": "wokwi-neopixel",
       "id": "s1_18",
-      "top": 20,
+      "top": 80,
       "left": 210,
       "attrs": {}
     },
     {
       "type": "wokwi-neopixel",
       "id": "s2_18",
-      "top": 600,
+      "top": 340,
       "left": 210,
       "attrs": {}
     },
     {
       "type": "wokwi-neopixel",
       "id": "s1_19",
-      "top": 20,
+      "top": 80,
       "left": 240,
       "attrs": {}
     },
     {
       "type": "wokwi-neopixel",
       "id": "s2_19",
-      "top": 600,
+      "top": 340,
       "left": 240,
       "attrs": {}
     },
     {
       "type": "wokwi-neopixel",
       "id": "s1_20",
-      "top": 20,
+      "top": 80,
       "left": 270,
       "attrs": {}
     },
     {
       "type": "wokwi-neopixel",
       "id": "s2_20",
-      "top": 600,
+      "top": 340,
       "left": 270,
       "attrs": {}
     },
     {
       "type": "wokwi-neopixel",
       "id": "s1_21",
-      "top": 20,
+      "top": 80,
       "left": 300,
       "attrs": {}
     },
     {
       "type": "wokwi-neopixel",
       "id": "s2_21",
-      "top": 600,
+      "top": 340,
       "left": 300,
       "attrs": {}
     },
     {
       "type": "wokwi-resistor",
       "id": "r1",
-      "top": 450,
+      "top": 250,
       "left": 260,
       "attrs": {
         "value": "10000"
@@ -331,7 +331,7 @@
     {
       "type": "wokwi-pushbutton",
       "id": "btn",
-      "top": 400,
+      "top": 200,
       "left": 320,
       "attrs": {}
     }
