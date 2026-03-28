@@ -421,8 +421,8 @@ void policeLights(int loopMax) {
 // Breath effect with sine
 void breathEffect(int loopMax) {
 
-  const int MIN_INTENSITY = 10;
-  const int MAX_INTENSITY = 80;
+  const uint8_t MIN_INTENSITY = 10;
+  const uint8_t MAX_INTENSITY = 80;
 
   static uint8_t theta = 0;
 
@@ -432,18 +432,14 @@ void breathEffect(int loopMax) {
   // update only on pulse
   if (loopPulse == true) {
 
-    // advance phase (speed of breathing)
-    theta += 2;
+    // advance phase
+    theta++;
 
-    // convert 0–255 to radians (0–2π)
-    float angle = (theta / 255.0f) * 2.0f * PI;
+    // sin8: map theta (0–255) to sine output (0–255), like FastLED sin8
+    uint8_t s = (uint8_t)((sin((theta / 255.0f) * 2.0f * PI) + 1.0f) * 127.5f);
 
-    // sin() gives -1..1 → map to 0..1
-    float s = (sin(angle) + 1.0f) * 0.5f;
-
-    // map to intensity range
-    int intensity = MIN_INTENSITY +
-                    (int)((MAX_INTENSITY - MIN_INTENSITY) * s);
+    // map 0–255 to intensity range
+    int intensity = map(s, 0, 255, MIN_INTENSITY, MAX_INTENSITY);
 
     fillStrip(1, 0, LED_COUNT, intensity, 0, intensity);
     fillStrip(2, 0, LED_COUNT, intensity, 0, intensity);
