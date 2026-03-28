@@ -6,28 +6,28 @@
     {
       "type": "wokwi-arduino-nano",
       "id": "nano",
-      "top": 100,
+      "top": 150,
       "left": 0,
       "attrs": {}
     },
     {
-      "type": "wokwi-apa102-strip",
+      "type": "wokwi-neopixel-strip",
       "id": "strip1",
       "top": 0,
-      "left": -300,
+      "left": -320,
       "attrs": { "leds": "22" }
     },
     {
-      "type": "wokwi-apa102-strip",
+      "type": "wokwi-neopixel-strip",
       "id": "strip2",
-      "top": 250,
-      "left": -300,
+      "top": 300,
+      "left": -320,
       "attrs": { "leds": "22" }
     },
     {
       "type": "wokwi-resistor",
       "id": "r1",
-      "top": 150,
+      "top": 200,
       "left": 250,
       "attrs": { "value": "10000" },
       "rotate": 90
@@ -35,25 +35,23 @@
     {
       "type": "wokwi-pushbutton",
       "id": "btn",
-      "top": 100,
-      "left": 300,
+      "top": 150,
+      "left": 320,
       "attrs": {}
     }
   ],
   "connections": [
-    ["strip1:DI",  "nano:10",    "green",  []],
-    ["strip1:CI",  "nano:9",     "yellow", []],
+    ["strip1:DIN", "nano:10",    "green",  []],
     ["strip1:VCC", "nano:5V",    "red",    []],
     ["strip1:GND", "nano:GND.1", "black",  []],
 
-    ["strip2:DI",  "nano:12",    "green",  []],
-    ["strip2:CI",  "nano:11",    "yellow", []],
+    ["strip2:DIN", "nano:12",    "green",  []],
     ["strip2:VCC", "nano:5V",    "red",    []],
     ["strip2:GND", "nano:GND.2", "black",  []],
 
-    ["btn:1.r",  "nano:8",    "blue",  []],
-    ["btn:2.r",  "nano:5V",   "red",   []],
-    ["r1:1",     "nano:8",    "blue",  []],
-    ["r1:2",     "nano:GND.3","black", []]
+    ["btn:1.r",  "nano:8",     "blue",  []],
+    ["btn:2.r",  "nano:5V",    "red",   []],
+    ["r1:1",     "nano:8",     "blue",  []],
+    ["r1:2",     "nano:GND.3", "black", []]
   ]
 }
