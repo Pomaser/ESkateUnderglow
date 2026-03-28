@@ -15,7 +15,20 @@ Arduino firmware for APA102 (DotStar) LED underglow on an electric skateboard. U
 
 ## Build & Flash
 
-Open `eskate_glow/eskate_glow.ino` in the **Arduino IDE**. Install the **FastLED** library via the Library Manager, then compile and upload normally. There is no Makefile or CLI build system.
+Uses **arduino-cli** (installed at `/usr/local/bin/arduino-cli`). Board: `arduino:avr:nano`, FastLED library already installed.
+
+```bash
+# Compile
+arduino-cli compile -b arduino:avr:nano eskate_glow/
+
+# Upload (replace port as needed — check with: arduino-cli board list)
+arduino-cli upload -p /dev/ttyUSB0 -b arduino:avr:nano eskate_glow/
+
+# Compile + upload in one step
+arduino-cli compile -b arduino:avr:nano -p /dev/ttyUSB0 --upload eskate_glow/
+```
+
+If the port is not accessible without sudo: `sudo usermod -aG dialout $USER` (requires re-login).
 
 ## Code Architecture
 
