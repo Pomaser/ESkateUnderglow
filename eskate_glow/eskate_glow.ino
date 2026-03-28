@@ -9,20 +9,20 @@ const int PIN2_DATA = 12;
 // Pattern change button (active HIGH, external pull-down)
 const int PIN_CHANGE_PATTERN = 8;
 
-#define LED_COUNT 22
-const uint8_t GLOBAL_BRIGHTNESS = 10;
+#define LED_COUNT 22          // LEDs per strip
+const uint8_t GLOBAL_BRIGHTNESS = 10; // master brightness 0-255
 
-CRGB leds1[LED_COUNT];
-CRGB leds2[LED_COUNT];
+CRGB leds1[LED_COUNT]; // strip 1: data pin 10, clock pin 9
+CRGB leds2[LED_COUNT]; // strip 2: data pin 12, clock pin 11
 
 const int PATTERN_MAX = 6;          // highest pattern index
-const int TIMOUT_BUTTON_CYCLES = 500; // window for double-press detection
+const int TIMOUT_BUTTON_CYCLES = 200; // window for double-press detection
 
 // Shared timing state — written by loopCounter(), read by all effects
 bool loopPulse = false; // true for one iteration when the tick fires
 bool flipFlop  = false; // toggles each tick
 
-int patternIdx = 0;
+int patternIdx = 0; // active effect (0 = off, 1-PATTERN_MAX = effects)
 
 
 void setup()
@@ -40,7 +40,7 @@ void setup()
   pinMode(LED_BUILTIN, OUTPUT);
   delay(40); // let external pull-down settle
 
-  fillStrip(1, 0, LED_COUNT, 0, 0, 0);
+  fillStrip(1, 0, LED_COUNT, 0, 0, 0); // start with all LEDs off
   fillStrip(2, 0, LED_COUNT, 0, 0, 0);
   FastLED.show();
 }
@@ -67,7 +67,7 @@ void loop()
     default: patternIdx = 0;                      break;
   }
 
-  FastLED.show();
+  FastLED.show(); // send frame to hardware
 }
 
 
@@ -92,7 +92,7 @@ bool readButton()
   lastButtonState = buttonState;
 
   if (buttonCounter > 0) {
-    buttonTimer++;
+    buttonTimer++; // counts iterations since first press
   }
 
   // timeout — discard incomplete press sequence
@@ -162,7 +162,7 @@ void rainbow(int loopDelay, byte colorLen) {
       leds1[idx] = leds1[idx-1];
     }
 
-    memcpy(leds2, leds1, sizeof(leds2));
+    memcpy(leds2, leds1, sizeof(leds2)); // mirror strip 1 to strip 2
   }
 }
 
@@ -174,7 +174,7 @@ void knightScanner(int beamLen, int loopMax)
   static bool positiveDirection = true;
 
   CRGB beamShape[beamLen];
-  const int BEAM_OFFSET = beamLen - 1;
+  const int BEAM_OFFSET = beamLen - 1; // extra range so beam fully enters/exits the strip
 
   // build brightness gradient: full at head, zero at tail
   float beamSpread = 255.0 / (beamLen - 1);
@@ -298,8 +298,8 @@ void policeLights(int loopMax) {
 // Purple sine-wave breathing: intensity oscillates between MIN and MAX using sin8.
 void breathEffect(int loopMax) {
 
-  const uint8_t MIN_INTENSITY = 10;
-  const uint8_t MAX_INTENSITY = 80;
+  const uint8_t MIN_INTENSITY = 10; // color component 0-255 at breath valley
+  const uint8_t MAX_INTENSITY = 80; // color component 0-255 at breath peak
 
   static uint8_t theta = 0;
 
@@ -317,8 +317,8 @@ void breathEffect(int loopMax) {
 // Blue-white shooting star: bright head with a fading trail that decays via nscale8.
 void meteorEffect(int loopMax) {
 
-  const int     METEOR_SIZE  = 5;
-  const uint8_t TRAIL_DECAY  = 192; // 0-255: higher = longer trail
+  const int     METEOR_SIZE  = 5;   // number of LEDs in the meteor body
+  const uint8_t TRAIL_DECAY  = 192; // nscale8 factor per tick: higher = longer trail
 
   static int pos = 0;
 
@@ -343,7 +343,7 @@ void meteorEffect(int loopMax) {
     }
 
     if (++pos >= LED_COUNT + METEOR_SIZE) {
-      pos = 0;
+      pos = 0; // reset once meteor fully exits the strip
     }
   }
 }
