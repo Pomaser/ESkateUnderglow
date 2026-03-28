@@ -3,85 +3,1155 @@
   "author": "ESkateUnderglow",
   "editor": "wokwi",
   "parts": [
-    { "type": "wokwi-arduino-nano", "id": "nano", "top": 180, "left": 20, "attrs": {} },
-
-    { "type": "wokwi-neopixel", "id": "s1_0", "top": 20, "left": -300, "attrs": {} },
-    { "type": "wokwi-neopixel", "id": "s1_1", "top": 20, "left": -260, "attrs": {} },
-    { "type": "wokwi-neopixel", "id": "s1_2", "top": 20, "left": -220, "attrs": {} },
-    { "type": "wokwi-neopixel", "id": "s1_3", "top": 20, "left": -180, "attrs": {} },
-    { "type": "wokwi-neopixel", "id": "s1_4", "top": 20, "left": -140, "attrs": {} },
-    { "type": "wokwi-neopixel", "id": "s1_5", "top": 20, "left": -100, "attrs": {} },
-    { "type": "wokwi-neopixel", "id": "s1_6", "top": 20, "left": -60,  "attrs": {} },
-    { "type": "wokwi-neopixel", "id": "s1_7", "top": 20, "left": -20,  "attrs": {} },
-
-    { "type": "wokwi-neopixel", "id": "s2_0", "top": 380, "left": -300, "attrs": {} },
-    { "type": "wokwi-neopixel", "id": "s2_1", "top": 380, "left": -260, "attrs": {} },
-    { "type": "wokwi-neopixel", "id": "s2_2", "top": 380, "left": -220, "attrs": {} },
-    { "type": "wokwi-neopixel", "id": "s2_3", "top": 380, "left": -180, "attrs": {} },
-    { "type": "wokwi-neopixel", "id": "s2_4", "top": 380, "left": -140, "attrs": {} },
-    { "type": "wokwi-neopixel", "id": "s2_5", "top": 380, "left": -100, "attrs": {} },
-    { "type": "wokwi-neopixel", "id": "s2_6", "top": 380, "left": -60,  "attrs": {} },
-    { "type": "wokwi-neopixel", "id": "s2_7", "top": 380, "left": -20,  "attrs": {} },
-
-    { "type": "wokwi-resistor", "id": "r1", "top": 230, "left": 260, "attrs": { "value": "10000" }, "rotate": 90 },
-    { "type": "wokwi-pushbutton", "id": "btn", "top": 180, "left": 320, "attrs": {} }
+    {
+      "type": "wokwi-arduino-nano",
+      "id": "nano",
+      "top": 400,
+      "left": 20,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-neopixel",
+      "id": "s1_0",
+      "top": 20,
+      "left": -330,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-neopixel",
+      "id": "s2_0",
+      "top": 600,
+      "left": -330,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-neopixel",
+      "id": "s1_1",
+      "top": 20,
+      "left": -300,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-neopixel",
+      "id": "s2_1",
+      "top": 600,
+      "left": -300,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-neopixel",
+      "id": "s1_2",
+      "top": 20,
+      "left": -270,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-neopixel",
+      "id": "s2_2",
+      "top": 600,
+      "left": -270,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-neopixel",
+      "id": "s1_3",
+      "top": 20,
+      "left": -240,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-neopixel",
+      "id": "s2_3",
+      "top": 600,
+      "left": -240,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-neopixel",
+      "id": "s1_4",
+      "top": 20,
+      "left": -210,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-neopixel",
+      "id": "s2_4",
+      "top": 600,
+      "left": -210,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-neopixel",
+      "id": "s1_5",
+      "top": 20,
+      "left": -180,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-neopixel",
+      "id": "s2_5",
+      "top": 600,
+      "left": -180,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-neopixel",
+      "id": "s1_6",
+      "top": 20,
+      "left": -150,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-neopixel",
+      "id": "s2_6",
+      "top": 600,
+      "left": -150,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-neopixel",
+      "id": "s1_7",
+      "top": 20,
+      "left": -120,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-neopixel",
+      "id": "s2_7",
+      "top": 600,
+      "left": -120,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-neopixel",
+      "id": "s1_8",
+      "top": 20,
+      "left": -90,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-neopixel",
+      "id": "s2_8",
+      "top": 600,
+      "left": -90,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-neopixel",
+      "id": "s1_9",
+      "top": 20,
+      "left": -60,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-neopixel",
+      "id": "s2_9",
+      "top": 600,
+      "left": -60,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-neopixel",
+      "id": "s1_10",
+      "top": 20,
+      "left": -30,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-neopixel",
+      "id": "s2_10",
+      "top": 600,
+      "left": -30,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-neopixel",
+      "id": "s1_11",
+      "top": 20,
+      "left": 0,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-neopixel",
+      "id": "s2_11",
+      "top": 600,
+      "left": 0,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-neopixel",
+      "id": "s1_12",
+      "top": 20,
+      "left": 30,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-neopixel",
+      "id": "s2_12",
+      "top": 600,
+      "left": 30,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-neopixel",
+      "id": "s1_13",
+      "top": 20,
+      "left": 60,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-neopixel",
+      "id": "s2_13",
+      "top": 600,
+      "left": 60,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-neopixel",
+      "id": "s1_14",
+      "top": 20,
+      "left": 90,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-neopixel",
+      "id": "s2_14",
+      "top": 600,
+      "left": 90,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-neopixel",
+      "id": "s1_15",
+      "top": 20,
+      "left": 120,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-neopixel",
+      "id": "s2_15",
+      "top": 600,
+      "left": 120,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-neopixel",
+      "id": "s1_16",
+      "top": 20,
+      "left": 150,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-neopixel",
+      "id": "s2_16",
+      "top": 600,
+      "left": 150,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-neopixel",
+      "id": "s1_17",
+      "top": 20,
+      "left": 180,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-neopixel",
+      "id": "s2_17",
+      "top": 600,
+      "left": 180,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-neopixel",
+      "id": "s1_18",
+      "top": 20,
+      "left": 210,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-neopixel",
+      "id": "s2_18",
+      "top": 600,
+      "left": 210,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-neopixel",
+      "id": "s1_19",
+      "top": 20,
+      "left": 240,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-neopixel",
+      "id": "s2_19",
+      "top": 600,
+      "left": 240,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-neopixel",
+      "id": "s1_20",
+      "top": 20,
+      "left": 270,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-neopixel",
+      "id": "s2_20",
+      "top": 600,
+      "left": 270,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-neopixel",
+      "id": "s1_21",
+      "top": 20,
+      "left": 300,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-neopixel",
+      "id": "s2_21",
+      "top": 600,
+      "left": 300,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-resistor",
+      "id": "r1",
+      "top": 450,
+      "left": 260,
+      "attrs": {
+        "value": "10000"
+      },
+      "rotate": 90
+    },
+    {
+      "type": "wokwi-pushbutton",
+      "id": "btn",
+      "top": 400,
+      "left": 320,
+      "attrs": {}
+    }
   ],
   "connections": [
-    ["nano:10",    "s1_0:DIN", "green", []],
-    ["s1_0:DOUT",  "s1_1:DIN", "green", []],
-    ["s1_1:DOUT",  "s1_2:DIN", "green", []],
-    ["s1_2:DOUT",  "s1_3:DIN", "green", []],
-    ["s1_3:DOUT",  "s1_4:DIN", "green", []],
-    ["s1_4:DOUT",  "s1_5:DIN", "green", []],
-    ["s1_5:DOUT",  "s1_6:DIN", "green", []],
-    ["s1_6:DOUT",  "s1_7:DIN", "green", []],
-
-    ["s1_0:VDD", "nano:5V",    "red",   []],
-    ["s1_0:VSS", "nano:GND.1", "black", []],
-    ["s1_1:VDD", "nano:5V",    "red",   []],
-    ["s1_1:VSS", "nano:GND.1", "black", []],
-    ["s1_2:VDD", "nano:5V",    "red",   []],
-    ["s1_2:VSS", "nano:GND.1", "black", []],
-    ["s1_3:VDD", "nano:5V",    "red",   []],
-    ["s1_3:VSS", "nano:GND.1", "black", []],
-    ["s1_4:VDD", "nano:5V",    "red",   []],
-    ["s1_4:VSS", "nano:GND.1", "black", []],
-    ["s1_5:VDD", "nano:5V",    "red",   []],
-    ["s1_5:VSS", "nano:GND.1", "black", []],
-    ["s1_6:VDD", "nano:5V",    "red",   []],
-    ["s1_6:VSS", "nano:GND.1", "black", []],
-    ["s1_7:VDD", "nano:5V",    "red",   []],
-    ["s1_7:VSS", "nano:GND.1", "black", []],
-
-    ["nano:12",    "s2_0:DIN", "green", []],
-    ["s2_0:DOUT",  "s2_1:DIN", "green", []],
-    ["s2_1:DOUT",  "s2_2:DIN", "green", []],
-    ["s2_2:DOUT",  "s2_3:DIN", "green", []],
-    ["s2_3:DOUT",  "s2_4:DIN", "green", []],
-    ["s2_4:DOUT",  "s2_5:DIN", "green", []],
-    ["s2_5:DOUT",  "s2_6:DIN", "green", []],
-    ["s2_6:DOUT",  "s2_7:DIN", "green", []],
-
-    ["s2_0:VDD", "nano:5V",    "red",   []],
-    ["s2_0:VSS", "nano:GND.2", "black", []],
-    ["s2_1:VDD", "nano:5V",    "red",   []],
-    ["s2_1:VSS", "nano:GND.2", "black", []],
-    ["s2_2:VDD", "nano:5V",    "red",   []],
-    ["s2_2:VSS", "nano:GND.2", "black", []],
-    ["s2_3:VDD", "nano:5V",    "red",   []],
-    ["s2_3:VSS", "nano:GND.2", "black", []],
-    ["s2_4:VDD", "nano:5V",    "red",   []],
-    ["s2_4:VSS", "nano:GND.2", "black", []],
-    ["s2_5:VDD", "nano:5V",    "red",   []],
-    ["s2_5:VSS", "nano:GND.2", "black", []],
-    ["s2_6:VDD", "nano:5V",    "red",   []],
-    ["s2_6:VSS", "nano:GND.2", "black", []],
-    ["s2_7:VDD", "nano:5V",    "red",   []],
-    ["s2_7:VSS", "nano:GND.2", "black", []],
-
-    ["btn:1.r", "nano:8",     "blue",  []],
-    ["btn:2.r", "nano:5V",    "red",   []],
-    ["r1:1",    "nano:8",     "blue",  []],
-    ["r1:2",    "nano:GND.3", "black", []]
+    [
+      "nano:10",
+      "s1_0:DIN",
+      "green",
+      []
+    ],
+    [
+      "s1_0:DOUT",
+      "s1_1:DIN",
+      "green",
+      []
+    ],
+    [
+      "s1_1:DOUT",
+      "s1_2:DIN",
+      "green",
+      []
+    ],
+    [
+      "s1_2:DOUT",
+      "s1_3:DIN",
+      "green",
+      []
+    ],
+    [
+      "s1_3:DOUT",
+      "s1_4:DIN",
+      "green",
+      []
+    ],
+    [
+      "s1_4:DOUT",
+      "s1_5:DIN",
+      "green",
+      []
+    ],
+    [
+      "s1_5:DOUT",
+      "s1_6:DIN",
+      "green",
+      []
+    ],
+    [
+      "s1_6:DOUT",
+      "s1_7:DIN",
+      "green",
+      []
+    ],
+    [
+      "s1_7:DOUT",
+      "s1_8:DIN",
+      "green",
+      []
+    ],
+    [
+      "s1_8:DOUT",
+      "s1_9:DIN",
+      "green",
+      []
+    ],
+    [
+      "s1_9:DOUT",
+      "s1_10:DIN",
+      "green",
+      []
+    ],
+    [
+      "s1_10:DOUT",
+      "s1_11:DIN",
+      "green",
+      []
+    ],
+    [
+      "s1_11:DOUT",
+      "s1_12:DIN",
+      "green",
+      []
+    ],
+    [
+      "s1_12:DOUT",
+      "s1_13:DIN",
+      "green",
+      []
+    ],
+    [
+      "s1_13:DOUT",
+      "s1_14:DIN",
+      "green",
+      []
+    ],
+    [
+      "s1_14:DOUT",
+      "s1_15:DIN",
+      "green",
+      []
+    ],
+    [
+      "s1_15:DOUT",
+      "s1_16:DIN",
+      "green",
+      []
+    ],
+    [
+      "s1_16:DOUT",
+      "s1_17:DIN",
+      "green",
+      []
+    ],
+    [
+      "s1_17:DOUT",
+      "s1_18:DIN",
+      "green",
+      []
+    ],
+    [
+      "s1_18:DOUT",
+      "s1_19:DIN",
+      "green",
+      []
+    ],
+    [
+      "s1_19:DOUT",
+      "s1_20:DIN",
+      "green",
+      []
+    ],
+    [
+      "s1_20:DOUT",
+      "s1_21:DIN",
+      "green",
+      []
+    ],
+    [
+      "nano:12",
+      "s2_0:DIN",
+      "green",
+      []
+    ],
+    [
+      "s2_0:DOUT",
+      "s2_1:DIN",
+      "green",
+      []
+    ],
+    [
+      "s2_1:DOUT",
+      "s2_2:DIN",
+      "green",
+      []
+    ],
+    [
+      "s2_2:DOUT",
+      "s2_3:DIN",
+      "green",
+      []
+    ],
+    [
+      "s2_3:DOUT",
+      "s2_4:DIN",
+      "green",
+      []
+    ],
+    [
+      "s2_4:DOUT",
+      "s2_5:DIN",
+      "green",
+      []
+    ],
+    [
+      "s2_5:DOUT",
+      "s2_6:DIN",
+      "green",
+      []
+    ],
+    [
+      "s2_6:DOUT",
+      "s2_7:DIN",
+      "green",
+      []
+    ],
+    [
+      "s2_7:DOUT",
+      "s2_8:DIN",
+      "green",
+      []
+    ],
+    [
+      "s2_8:DOUT",
+      "s2_9:DIN",
+      "green",
+      []
+    ],
+    [
+      "s2_9:DOUT",
+      "s2_10:DIN",
+      "green",
+      []
+    ],
+    [
+      "s2_10:DOUT",
+      "s2_11:DIN",
+      "green",
+      []
+    ],
+    [
+      "s2_11:DOUT",
+      "s2_12:DIN",
+      "green",
+      []
+    ],
+    [
+      "s2_12:DOUT",
+      "s2_13:DIN",
+      "green",
+      []
+    ],
+    [
+      "s2_13:DOUT",
+      "s2_14:DIN",
+      "green",
+      []
+    ],
+    [
+      "s2_14:DOUT",
+      "s2_15:DIN",
+      "green",
+      []
+    ],
+    [
+      "s2_15:DOUT",
+      "s2_16:DIN",
+      "green",
+      []
+    ],
+    [
+      "s2_16:DOUT",
+      "s2_17:DIN",
+      "green",
+      []
+    ],
+    [
+      "s2_17:DOUT",
+      "s2_18:DIN",
+      "green",
+      []
+    ],
+    [
+      "s2_18:DOUT",
+      "s2_19:DIN",
+      "green",
+      []
+    ],
+    [
+      "s2_19:DOUT",
+      "s2_20:DIN",
+      "green",
+      []
+    ],
+    [
+      "s2_20:DOUT",
+      "s2_21:DIN",
+      "green",
+      []
+    ],
+    [
+      "s1_0:VDD",
+      "nano:5V",
+      "red",
+      []
+    ],
+    [
+      "s1_0:VSS",
+      "nano:GND.1",
+      "black",
+      []
+    ],
+    [
+      "s1_1:VDD",
+      "nano:5V",
+      "red",
+      []
+    ],
+    [
+      "s1_1:VSS",
+      "nano:GND.1",
+      "black",
+      []
+    ],
+    [
+      "s1_2:VDD",
+      "nano:5V",
+      "red",
+      []
+    ],
+    [
+      "s1_2:VSS",
+      "nano:GND.1",
+      "black",
+      []
+    ],
+    [
+      "s1_3:VDD",
+      "nano:5V",
+      "red",
+      []
+    ],
+    [
+      "s1_3:VSS",
+      "nano:GND.1",
+      "black",
+      []
+    ],
+    [
+      "s1_4:VDD",
+      "nano:5V",
+      "red",
+      []
+    ],
+    [
+      "s1_4:VSS",
+      "nano:GND.1",
+      "black",
+      []
+    ],
+    [
+      "s1_5:VDD",
+      "nano:5V",
+      "red",
+      []
+    ],
+    [
+      "s1_5:VSS",
+      "nano:GND.1",
+      "black",
+      []
+    ],
+    [
+      "s1_6:VDD",
+      "nano:5V",
+      "red",
+      []
+    ],
+    [
+      "s1_6:VSS",
+      "nano:GND.1",
+      "black",
+      []
+    ],
+    [
+      "s1_7:VDD",
+      "nano:5V",
+      "red",
+      []
+    ],
+    [
+      "s1_7:VSS",
+      "nano:GND.1",
+      "black",
+      []
+    ],
+    [
+      "s1_8:VDD",
+      "nano:5V",
+      "red",
+      []
+    ],
+    [
+      "s1_8:VSS",
+      "nano:GND.1",
+      "black",
+      []
+    ],
+    [
+      "s1_9:VDD",
+      "nano:5V",
+      "red",
+      []
+    ],
+    [
+      "s1_9:VSS",
+      "nano:GND.1",
+      "black",
+      []
+    ],
+    [
+      "s1_10:VDD",
+      "nano:5V",
+      "red",
+      []
+    ],
+    [
+      "s1_10:VSS",
+      "nano:GND.1",
+      "black",
+      []
+    ],
+    [
+      "s1_11:VDD",
+      "nano:5V",
+      "red",
+      []
+    ],
+    [
+      "s1_11:VSS",
+      "nano:GND.1",
+      "black",
+      []
+    ],
+    [
+      "s1_12:VDD",
+      "nano:5V",
+      "red",
+      []
+    ],
+    [
+      "s1_12:VSS",
+      "nano:GND.1",
+      "black",
+      []
+    ],
+    [
+      "s1_13:VDD",
+      "nano:5V",
+      "red",
+      []
+    ],
+    [
+      "s1_13:VSS",
+      "nano:GND.1",
+      "black",
+      []
+    ],
+    [
+      "s1_14:VDD",
+      "nano:5V",
+      "red",
+      []
+    ],
+    [
+      "s1_14:VSS",
+      "nano:GND.1",
+      "black",
+      []
+    ],
+    [
+      "s1_15:VDD",
+      "nano:5V",
+      "red",
+      []
+    ],
+    [
+      "s1_15:VSS",
+      "nano:GND.1",
+      "black",
+      []
+    ],
+    [
+      "s1_16:VDD",
+      "nano:5V",
+      "red",
+      []
+    ],
+    [
+      "s1_16:VSS",
+      "nano:GND.1",
+      "black",
+      []
+    ],
+    [
+      "s1_17:VDD",
+      "nano:5V",
+      "red",
+      []
+    ],
+    [
+      "s1_17:VSS",
+      "nano:GND.1",
+      "black",
+      []
+    ],
+    [
+      "s1_18:VDD",
+      "nano:5V",
+      "red",
+      []
+    ],
+    [
+      "s1_18:VSS",
+      "nano:GND.1",
+      "black",
+      []
+    ],
+    [
+      "s1_19:VDD",
+      "nano:5V",
+      "red",
+      []
+    ],
+    [
+      "s1_19:VSS",
+      "nano:GND.1",
+      "black",
+      []
+    ],
+    [
+      "s1_20:VDD",
+      "nano:5V",
+      "red",
+      []
+    ],
+    [
+      "s1_20:VSS",
+      "nano:GND.1",
+      "black",
+      []
+    ],
+    [
+      "s1_21:VDD",
+      "nano:5V",
+      "red",
+      []
+    ],
+    [
+      "s1_21:VSS",
+      "nano:GND.1",
+      "black",
+      []
+    ],
+    [
+      "s2_0:VDD",
+      "nano:5V",
+      "red",
+      []
+    ],
+    [
+      "s2_0:VSS",
+      "nano:GND.2",
+      "black",
+      []
+    ],
+    [
+      "s2_1:VDD",
+      "nano:5V",
+      "red",
+      []
+    ],
+    [
+      "s2_1:VSS",
+      "nano:GND.2",
+      "black",
+      []
+    ],
+    [
+      "s2_2:VDD",
+      "nano:5V",
+      "red",
+      []
+    ],
+    [
+      "s2_2:VSS",
+      "nano:GND.2",
+      "black",
+      []
+    ],
+    [
+      "s2_3:VDD",
+      "nano:5V",
+      "red",
+      []
+    ],
+    [
+      "s2_3:VSS",
+      "nano:GND.2",
+      "black",
+      []
+    ],
+    [
+      "s2_4:VDD",
+      "nano:5V",
+      "red",
+      []
+    ],
+    [
+      "s2_4:VSS",
+      "nano:GND.2",
+      "black",
+      []
+    ],
+    [
+      "s2_5:VDD",
+      "nano:5V",
+      "red",
+      []
+    ],
+    [
+      "s2_5:VSS",
+      "nano:GND.2",
+      "black",
+      []
+    ],
+    [
+      "s2_6:VDD",
+      "nano:5V",
+      "red",
+      []
+    ],
+    [
+      "s2_6:VSS",
+      "nano:GND.2",
+      "black",
+      []
+    ],
+    [
+      "s2_7:VDD",
+      "nano:5V",
+      "red",
+      []
+    ],
+    [
+      "s2_7:VSS",
+      "nano:GND.2",
+      "black",
+      []
+    ],
+    [
+      "s2_8:VDD",
+      "nano:5V",
+      "red",
+      []
+    ],
+    [
+      "s2_8:VSS",
+      "nano:GND.2",
+      "black",
+      []
+    ],
+    [
+      "s2_9:VDD",
+      "nano:5V",
+      "red",
+      []
+    ],
+    [
+      "s2_9:VSS",
+      "nano:GND.2",
+      "black",
+      []
+    ],
+    [
+      "s2_10:VDD",
+      "nano:5V",
+      "red",
+      []
+    ],
+    [
+      "s2_10:VSS",
+      "nano:GND.2",
+      "black",
+      []
+    ],
+    [
+      "s2_11:VDD",
+      "nano:5V",
+      "red",
+      []
+    ],
+    [
+      "s2_11:VSS",
+      "nano:GND.2",
+      "black",
+      []
+    ],
+    [
+      "s2_12:VDD",
+      "nano:5V",
+      "red",
+      []
+    ],
+    [
+      "s2_12:VSS",
+      "nano:GND.2",
+      "black",
+      []
+    ],
+    [
+      "s2_13:VDD",
+      "nano:5V",
+      "red",
+      []
+    ],
+    [
+      "s2_13:VSS",
+      "nano:GND.2",
+      "black",
+      []
+    ],
+    [
+      "s2_14:VDD",
+      "nano:5V",
+      "red",
+      []
+    ],
+    [
+      "s2_14:VSS",
+      "nano:GND.2",
+      "black",
+      []
+    ],
+    [
+      "s2_15:VDD",
+      "nano:5V",
+      "red",
+      []
+    ],
+    [
+      "s2_15:VSS",
+      "nano:GND.2",
+      "black",
+      []
+    ],
+    [
+      "s2_16:VDD",
+      "nano:5V",
+      "red",
+      []
+    ],
+    [
+      "s2_16:VSS",
+      "nano:GND.2",
+      "black",
+      []
+    ],
+    [
+      "s2_17:VDD",
+      "nano:5V",
+      "red",
+      []
+    ],
+    [
+      "s2_17:VSS",
+      "nano:GND.2",
+      "black",
+      []
+    ],
+    [
+      "s2_18:VDD",
+      "nano:5V",
+      "red",
+      []
+    ],
+    [
+      "s2_18:VSS",
+      "nano:GND.2",
+      "black",
+      []
+    ],
+    [
+      "s2_19:VDD",
+      "nano:5V",
+      "red",
+      []
+    ],
+    [
+      "s2_19:VSS",
+      "nano:GND.2",
+      "black",
+      []
+    ],
+    [
+      "s2_20:VDD",
+      "nano:5V",
+      "red",
+      []
+    ],
+    [
+      "s2_20:VSS",
+      "nano:GND.2",
+      "black",
+      []
+    ],
+    [
+      "s2_21:VDD",
+      "nano:5V",
+      "red",
+      []
+    ],
+    [
+      "s2_21:VSS",
+      "nano:GND.2",
+      "black",
+      []
+    ],
+    [
+      "btn:1.r",
+      "nano:8",
+      "blue",
+      []
+    ],
+    [
+      "btn:2.r",
+      "nano:5V",
+      "red",
+      []
+    ],
+    [
+      "r1:1",
+      "nano:8",
+      "blue",
+      []
+    ],
+    [
+      "r1:2",
+      "nano:GND.3",
+      "black",
+      []
+    ]
   ]
 }
