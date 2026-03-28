@@ -16,7 +16,7 @@ CRGB leds1[LED_COUNT];
 CRGB leds2[LED_COUNT];
 
 // constants
-const int PATTERN_MAX = 5;
+const int PATTERN_MAX = 6;
 const int TIMOUT_BUTTON_CYCLES = 500;
 
 // shared timing state (written by loopCounter, read by effects)
@@ -77,6 +77,9 @@ void loop()
       break;
     case 5:
       strobe(20, CRGB(200, 200, 200));
+      break;
+    case 6:
+      meteorEffect(8);
       break;
     default:
       patternIdx = 0;
@@ -372,6 +375,42 @@ void breathEffect(int loopMax) {
 
     fillStrip(1, 0, LED_COUNT, intensity, 0, intensity);
     fillStrip(2, 0, LED_COUNT, intensity, 0, intensity);
+  }
+}
+
+
+// meteor effect — shooting star with fading trail
+void meteorEffect(int loopMax) {
+
+  const int     METEOR_SIZE  = 5;
+  const uint8_t TRAIL_DECAY  = 192; // 0-255: higher = longer trail
+
+  static int pos = 0;
+
+  loopCounter(loopMax);
+
+  if (loopPulse == true) {
+
+    // fade existing LEDs to extend trail
+    for (int i = 0; i < LED_COUNT; i++) {
+      leds1[i].nscale8(TRAIL_DECAY);
+      leds2[i].nscale8(TRAIL_DECAY);
+    }
+
+    // draw meteor head and body
+    for (int j = 0; j < METEOR_SIZE; j++) {
+      int idx = pos - j;
+      if (idx >= 0 && idx < LED_COUNT) {
+        uint8_t bright = 255 - (j * (255 / METEOR_SIZE));
+        leds1[idx] = CRGB(bright, bright, 255); // blue-white
+        leds2[idx] = CRGB(bright, bright, 255);
+      }
+    }
+
+    // advance and reset after meteor leaves strip
+    if (++pos >= LED_COUNT + METEOR_SIZE) {
+      pos = 0;
+    }
   }
 }
 
