@@ -1,0 +1,4 @@
+[wokwi]
+version = 1
+elf = "build/arduino.avr.nano/eskate_glow.ino.elf"
+firmware = "build/arduino.avr.nano/eskate_glow.ino.hex"
