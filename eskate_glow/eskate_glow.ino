@@ -29,8 +29,13 @@ int patternIdx = 0;
 // initialization stuff
 void setup()
 {
+#ifdef WOKWI_SIM
+  FastLED.addLeds<WS2812B, PIN1_DATA, GRB>(leds1, LED_COUNT);
+  FastLED.addLeds<WS2812B, PIN2_DATA, GRB>(leds2, LED_COUNT);
+#else
   FastLED.addLeds<APA102, PIN1_DATA, PIN1_CLOCK, BGR>(leds1, LED_COUNT);
   FastLED.addLeds<APA102, PIN2_DATA, PIN2_CLOCK, BGR>(leds2, LED_COUNT);
+#endif
   FastLED.setBrightness(GLOBAL_BRIGHTNESS);
 
   pinMode(PIN_CHANGE_PATTERN, INPUT);

@@ -3,55 +3,85 @@
   "author": "ESkateUnderglow",
   "editor": "wokwi",
   "parts": [
-    {
-      "type": "wokwi-arduino-nano",
-      "id": "nano",
-      "top": 150,
-      "left": 0,
-      "attrs": {}
-    },
-    {
-      "type": "wokwi-neopixel-strip",
-      "id": "strip1",
-      "top": 0,
-      "left": -320,
-      "attrs": { "leds": "22" }
-    },
-    {
-      "type": "wokwi-neopixel-strip",
-      "id": "strip2",
-      "top": 300,
-      "left": -320,
-      "attrs": { "leds": "22" }
-    },
-    {
-      "type": "wokwi-resistor",
-      "id": "r1",
-      "top": 200,
-      "left": 250,
-      "attrs": { "value": "10000" },
-      "rotate": 90
-    },
-    {
-      "type": "wokwi-pushbutton",
-      "id": "btn",
-      "top": 150,
-      "left": 320,
-      "attrs": {}
-    }
+    { "type": "wokwi-arduino-nano", "id": "nano", "top": 180, "left": 20, "attrs": {} },
+
+    { "type": "wokwi-neopixel", "id": "s1_0", "top": 20, "left": -300, "attrs": {} },
+    { "type": "wokwi-neopixel", "id": "s1_1", "top": 20, "left": -260, "attrs": {} },
+    { "type": "wokwi-neopixel", "id": "s1_2", "top": 20, "left": -220, "attrs": {} },
+    { "type": "wokwi-neopixel", "id": "s1_3", "top": 20, "left": -180, "attrs": {} },
+    { "type": "wokwi-neopixel", "id": "s1_4", "top": 20, "left": -140, "attrs": {} },
+    { "type": "wokwi-neopixel", "id": "s1_5", "top": 20, "left": -100, "attrs": {} },
+    { "type": "wokwi-neopixel", "id": "s1_6", "top": 20, "left": -60,  "attrs": {} },
+    { "type": "wokwi-neopixel", "id": "s1_7", "top": 20, "left": -20,  "attrs": {} },
+
+    { "type": "wokwi-neopixel", "id": "s2_0", "top": 380, "left": -300, "attrs": {} },
+    { "type": "wokwi-neopixel", "id": "s2_1", "top": 380, "left": -260, "attrs": {} },
+    { "type": "wokwi-neopixel", "id": "s2_2", "top": 380, "left": -220, "attrs": {} },
+    { "type": "wokwi-neopixel", "id": "s2_3", "top": 380, "left": -180, "attrs": {} },
+    { "type": "wokwi-neopixel", "id": "s2_4", "top": 380, "left": -140, "attrs": {} },
+    { "type": "wokwi-neopixel", "id": "s2_5", "top": 380, "left": -100, "attrs": {} },
+    { "type": "wokwi-neopixel", "id": "s2_6", "top": 380, "left": -60,  "attrs": {} },
+    { "type": "wokwi-neopixel", "id": "s2_7", "top": 380, "left": -20,  "attrs": {} },
+
+    { "type": "wokwi-resistor", "id": "r1", "top": 230, "left": 260, "attrs": { "value": "10000" }, "rotate": 90 },
+    { "type": "wokwi-pushbutton", "id": "btn", "top": 180, "left": 320, "attrs": {} }
   ],
   "connections": [
-    ["strip1:DIN", "nano:10",    "green",  []],
-    ["strip1:VCC", "nano:5V",    "red",    []],
-    ["strip1:GND", "nano:GND.1", "black",  []],
+    ["nano:10",    "s1_0:DIN", "green", []],
+    ["s1_0:DOUT",  "s1_1:DIN", "green", []],
+    ["s1_1:DOUT",  "s1_2:DIN", "green", []],
+    ["s1_2:DOUT",  "s1_3:DIN", "green", []],
+    ["s1_3:DOUT",  "s1_4:DIN", "green", []],
+    ["s1_4:DOUT",  "s1_5:DIN", "green", []],
+    ["s1_5:DOUT",  "s1_6:DIN", "green", []],
+    ["s1_6:DOUT",  "s1_7:DIN", "green", []],
 
-    ["strip2:DIN", "nano:12",    "green",  []],
-    ["strip2:VCC", "nano:5V",    "red",    []],
-    ["strip2:GND", "nano:GND.2", "black",  []],
+    ["s1_0:VDD", "nano:5V",    "red",   []],
+    ["s1_0:VSS", "nano:GND.1", "black", []],
+    ["s1_1:VDD", "nano:5V",    "red",   []],
+    ["s1_1:VSS", "nano:GND.1", "black", []],
+    ["s1_2:VDD", "nano:5V",    "red",   []],
+    ["s1_2:VSS", "nano:GND.1", "black", []],
+    ["s1_3:VDD", "nano:5V",    "red",   []],
+    ["s1_3:VSS", "nano:GND.1", "black", []],
+    ["s1_4:VDD", "nano:5V",    "red",   []],
+    ["s1_4:VSS", "nano:GND.1", "black", []],
+    ["s1_5:VDD", "nano:5V",    "red",   []],
+    ["s1_5:VSS", "nano:GND.1", "black", []],
+    ["s1_6:VDD", "nano:5V",    "red",   []],
+    ["s1_6:VSS", "nano:GND.1", "black", []],
+    ["s1_7:VDD", "nano:5V",    "red",   []],
+    ["s1_7:VSS", "nano:GND.1", "black", []],
 
-    ["btn:1.r",  "nano:8",     "blue",  []],
-    ["btn:2.r",  "nano:5V",    "red",   []],
-    ["r1:1",     "nano:8",     "blue",  []],
-    ["r1:2",     "nano:GND.3", "black", []]
+    ["nano:12",    "s2_0:DIN", "green", []],
+    ["s2_0:DOUT",  "s2_1:DIN", "green", []],
+    ["s2_1:DOUT",  "s2_2:DIN", "green", []],
+    ["s2_2:DOUT",  "s2_3:DIN", "green", []],
+    ["s2_3:DOUT",  "s2_4:DIN", "green", []],
+    ["s2_4:DOUT",  "s2_5:DIN", "green", []],
+    ["s2_5:DOUT",  "s2_6:DIN", "green", []],
+    ["s2_6:DOUT",  "s2_7:DIN", "green", []],
+
+    ["s2_0:VDD", "nano:5V",    "red",   []],
+    ["s2_0:VSS", "nano:GND.2", "black", []],
+    ["s2_1:VDD", "nano:5V",    "red",   []],
+    ["s2_1:VSS", "nano:GND.2", "black", []],
+    ["s2_2:VDD", "nano:5V",    "red",   []],
+    ["s2_2:VSS", "nano:GND.2", "black", []],
+    ["s2_3:VDD", "nano:5V",    "red",   []],
+    ["s2_3:VSS", "nano:GND.2", "black", []],
+    ["s2_4:VDD", "nano:5V",    "red",   []],
+    ["s2_4:VSS", "nano:GND.2", "black", []],
+    ["s2_5:VDD", "nano:5V",    "red",   []],
+    ["s2_5:VSS", "nano:GND.2", "black", []],
+    ["s2_6:VDD", "nano:5V",    "red",   []],
+    ["s2_6:VSS", "nano:GND.2", "black", []],
+    ["s2_7:VDD", "nano:5V",    "red",   []],
+    ["s2_7:VSS", "nano:GND.2", "black", []],
+
+    ["btn:1.r", "nano:8",     "blue",  []],
+    ["btn:2.r", "nano:5V",    "red",   []],
+    ["r1:1",    "nano:8",     "blue",  []],
+    ["r1:2",    "nano:GND.3", "black", []]
   ]
 }
