@@ -38,7 +38,7 @@ const int   POLICE_SPLIT      = 11; // LED index dividing left/right half in spl
 // Wiring: motor JST pin 1 (+5V) → 5V, pin 2 (GND) → GND, pin 3 (Hall A) → D2
 const uint8_t  HALL_PIN      = 2;     // D2 = INT0
 const uint8_t  POLE_PAIRS    = 14;    // motor pole pairs (Meepo 540W = 14)
-const float    WHEEL_MM      = 90.0;  // wheel diameter [mm]
+const float    WHEEL_MM      = 100.0; // wheel diameter [mm]
 const uint32_t CALC_PERIOD   = 500;   // speed recalculation interval [ms]
 const uint32_t ZERO_THRESH   = 3000;  // no pulse for this long → 0 km/h [ms]
 const float    WHEEL_CIRC_M  = (WHEEL_MM * PI) / 1000.0; // wheel circumference [m]
@@ -72,6 +72,8 @@ void setup()
   fillStrip(1, 0, LED_COUNT, 0, 0, 0); // start with all LEDs off
   fillStrip(2, 0, LED_COUNT, 0, 0, 0);
   FastLED.show();
+
+  setupHallSensor();
 }
 
 
@@ -97,6 +99,9 @@ void loop()
   }
 
   FastLED.show(); // send frame to hardware
+
+  float speed = getSpeed(); // TODO: use speed to drive effects
+  (void)speed;              // suppress unused variable warning
 }
 
 
