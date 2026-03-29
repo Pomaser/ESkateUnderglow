@@ -34,11 +34,24 @@ const int   RAINBOW_COLOR_LEN = 10;
 const CRGB  STROBE_COLOR      = CRGB(200, 200, 200);
 const int   POLICE_SPLIT      = 11; // LED index dividing left/right half in split phase
 
+// Hall sensor — speed measurement (Meepo Mini 2 ER, LingYi hub motor)
+// Wiring: motor JST pin 1 (+5V) → 5V, pin 2 (GND) → GND, pin 3 (Hall A) → D2
+const uint8_t  HALL_PIN      = 2;     // D2 = INT0
+const uint8_t  POLE_PAIRS    = 14;    // motor pole pairs (Meepo 540W = 14)
+const float    WHEEL_MM      = 90.0;  // wheel diameter [mm]
+const uint32_t CALC_PERIOD   = 500;   // speed recalculation interval [ms]
+const uint32_t ZERO_THRESH   = 3000;  // no pulse for this long → 0 km/h [ms]
+const float    WHEEL_CIRC_M  = (WHEEL_MM * PI) / 1000.0; // wheel circumference [m]
+
 // Shared timing state — written by loopCounter(), read by all effects
 bool loopPulse = false; // true for one iteration when the tick fires
 bool flipFlop  = false; // toggles each tick
 
 int patternIdx = 0; // active effect (0 = off, 1-PATTERN_MAX = effects)
+
+// Hall sensor ISR state — volatile because modified inside interrupt
+volatile uint32_t hallPulseCount = 0; // total pulse count since boot
+volatile uint32_t hallLastPulseUs = 0; // timestamp of last pulse [µs]
 
 
 void setup()
@@ -363,6 +376,62 @@ void meteorEffect(const int loopMax)
       pos = 0; // reset once meteor fully exits the strip
     }
   }
+}
+
+
+// ISR — called on every rising edge of the Hall signal.
+void onHallPulse()
+{
+  hallPulseCount++;
+  hallLastPulseUs = micros();
+}
+
+
+// Attach interrupt to HALL_PIN. Call once from setup() when speed reading is needed.
+void setupHallSensor()
+{
+  pinMode(HALL_PIN, INPUT); // ESC provides pull-up via sensor connector
+  attachInterrupt(digitalPinToInterrupt(HALL_PIN), onHallPulse, RISING);
+}
+
+
+// Returns current speed in km/h.
+// Recalculates every CALC_PERIOD ms; returns cached value between periods.
+// Returns 0.0 if no pulse received within ZERO_THRESH ms.
+float getSpeed()
+{
+  static uint32_t prevCalcTime   = 0;
+  static uint32_t prevPulseSnap  = 0;
+  static float    cachedSpeedKmh = 0.0;
+
+  const uint32_t now = millis();
+  if (now - prevCalcTime < CALC_PERIOD) {
+    return cachedSpeedKmh;
+  }
+
+  // Atomically snapshot and reset pulse counter
+  noInterrupts();
+  const uint32_t pulses      = hallPulseCount - prevPulseSnap;
+  prevPulseSnap              = hallPulseCount;
+  const uint32_t lastPulseUs = hallLastPulseUs;
+  interrupts();
+
+  const float    dt_s    = (now - prevCalcTime) / 1000.0;
+  prevCalcTime           = now;
+
+  // No pulse received within ZERO_THRESH → board is stopped
+  const bool stopped = ((now - (lastPulseUs / 1000)) > ZERO_THRESH);
+
+  if (stopped || pulses == 0) {
+    cachedSpeedKmh = 0.0;
+  } else {
+    // rps = pulses / (POLE_PAIRS * dt)
+    // speed [km/h] = rps * circumference [m] * 3.6
+    const float rps = (float)pulses / ((float)POLE_PAIRS * dt_s);
+    cachedSpeedKmh  = rps * WHEEL_CIRC_M * 3.6;
+  }
+
+  return cachedSpeedKmh;
 }
 
 
