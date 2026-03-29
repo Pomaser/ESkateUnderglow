@@ -10,7 +10,7 @@ const int PIN2_DATA  = 12;
 const int PIN_CHANGE_PATTERN = 8;
 
 #define LED_COUNT 22                   // LEDs per strip
-const uint8_t GLOBAL_BRIGHTNESS = 10; // master brightness 0-255
+const uint8_t GLOBAL_BRIGHTNESS = 10;  // master brightness 0-255
 
 CRGB leds1[LED_COUNT]; // strip 1: data pin 10, clock pin 9
 CRGB leds2[LED_COUNT]; // strip 2: data pin 12, clock pin 11
@@ -72,7 +72,7 @@ void setup()
   ledsOff(); // start with all LEDs off
   FastLED.show();
 
-  // startup indicator: run meteor for 2 s so the user knows the system booted
+  // Startup indicator: run meteor for 2 s so the user knows the system booted
   const uint32_t startupEnd = millis() + 2000;
   while (millis() < startupEnd) {
     meteorEffect(METEOR_SPEED);
@@ -89,13 +89,13 @@ void setup()
 void loop()
 {
   if (readButton()) {
-    // clear strips before switching so old pixels don't bleed into new effect
+    // Clear strips before switching so old pixels don't bleed into new effect
     ledsOff();
     patternIdx = (patternIdx < PATTERN_MAX) ? patternIdx + 1 : 0;
   }
 
   switch (patternIdx) {
-    case 0: ledsOff();                                          break;
+    case 0: ledsOff();                                              break;
     case 1: knightScanner(KNIGHT_BEAM_LEN, KNIGHT_SPEED);           break;
     case 2: policeLights(POLICE_SPEED);                             break;
     case 3: rainbow(RAINBOW_SPEED, RAINBOW_COLOR_LEN);              break;
@@ -136,7 +136,7 @@ bool readButton()
     buttonTimer++; // counts iterations since first press
   }
 
-  // timeout — discard incomplete press sequence
+  // Timeout — discard incomplete press sequence
   if (buttonTimer > TIMOUT_BUTTON_CYCLES) {
     buttonCounter = 0;
     buttonTimer   = 0;
@@ -157,7 +157,7 @@ void strobe(const int loopDelay, const CRGB color)
 {
   loopCounter(loopDelay);
 
-  // flipFlop toggles each tick — use it directly for on/off
+  // Use flipFlop directly for on/off — it toggles each tick
   if (!flipFlop) {
     fillStrip(1, 0, LED_COUNT, color.r, color.g, color.b);
     fillStrip(2, 0, LED_COUNT, color.r, color.g, color.b);
@@ -173,7 +173,7 @@ void rainbow(const int loopDelay, const byte colorLen)
   static byte step             = 0;
   static int  transitionCounter = 0;
 
-  // clamp colorLen to a valid range without modifying the input parameter
+  // Clamp colorLen to a valid range without modifying the input parameter
   const byte effectiveLen = constrain(colorLen, 1, LED_COUNT - 1);
 
   loopCounter(loopDelay);
@@ -191,7 +191,7 @@ void rainbow(const int loopDelay, const byte colorLen)
       default: step = 0;                    break;
     }
 
-    // hold each color for effectiveLen ticks before advancing
+    // Hold each color for effectiveLen ticks before advancing
     if (transitionCounter < effectiveLen) {
       transitionCounter++;
     } else {
@@ -199,7 +199,7 @@ void rainbow(const int loopDelay, const byte colorLen)
       transitionCounter = 0;
     }
 
-    // shift strip towards the end
+    // Shift strip towards the end
     for (int idx = LED_COUNT - 1; idx > 0; idx--) {
       leds1[idx] = leds1[idx - 1];
     }
@@ -218,7 +218,7 @@ void knightScanner(const int beamLen, const int loopMax)
   CRGB beamShape[beamLen];
   const int BEAM_OFFSET = beamLen - 1; // extra range so beam fully enters/exits the strip
 
-  // build brightness gradient: full at head, zero at tail
+  // Build brightness gradient: full at head, zero at tail
   const float beamSpread = 255.0 / (beamLen - 1);
   for (int idx = 0; idx < beamLen; idx++) {
     const int beamStep = (idx < beamLen - 1) ? 255 - (idx * beamSpread) : 0;
@@ -227,7 +227,7 @@ void knightScanner(const int beamLen, const int loopMax)
 
   loopCounter(loopMax);
 
-  // advance position each tick, reverse at strip boundaries
+  // Advance position each tick, reverse at strip boundaries
   if ((positionIdx < LED_COUNT + BEAM_OFFSET - 1) && positiveDirection) {
     if (loopPulse) { positionIdx++; }
   } else {
@@ -240,7 +240,7 @@ void knightScanner(const int beamLen, const int loopMax)
     positiveDirection = true;
   }
 
-  // paint beam onto LED arrays (skip out-of-range indices)
+  // Paint beam onto LED arrays (skip out-of-range indices)
   if (positiveDirection) {
     for (int idx = 0; idx < beamLen; idx++) {
       const int copyPos = positionIdx - idx;
@@ -365,13 +365,13 @@ void meteorEffect(const int loopMax)
 
   if (loopPulse) {
 
-    // decay all pixels to extend the fading trail
+    // Decay all pixels to extend the fading trail
     for (int i = 0; i < LED_COUNT; i++) {
       leds1[i].nscale8(TRAIL_DECAY);
       leds2[i].nscale8(TRAIL_DECAY);
     }
 
-    // draw meteor: full brightness at head, dimming toward tail
+    // Draw meteor: full brightness at head, dimming toward tail
     for (int j = 0; j < METEOR_SIZE; j++) {
       const int idx = pos - j;
       if (idx >= 0 && idx < LED_COUNT) {
