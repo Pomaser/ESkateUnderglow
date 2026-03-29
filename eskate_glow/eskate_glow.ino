@@ -69,8 +69,7 @@ void setup()
   pinMode(LED_BUILTIN, OUTPUT);
   delay(STARTUP_DELAY_MS);
 
-  fillStrip(1, 0, LED_COUNT, 0, 0, 0); // start with all LEDs off
-  fillStrip(2, 0, LED_COUNT, 0, 0, 0);
+  clearStrips(); // start with all LEDs off
   FastLED.show();
 
   // startup indicator: run meteor for 2 s so the user knows the system booted
@@ -80,8 +79,7 @@ void setup()
     FastLED.show();
     delay(5);
   }
-  fillStrip(1, 0, LED_COUNT, 0, 0, 0); // clear after startup animation
-  fillStrip(2, 0, LED_COUNT, 0, 0, 0);
+  clearStrips(); // clear after startup animation
   FastLED.show();
 
   setupHallSensor();
@@ -92,14 +90,12 @@ void loop()
 {
   if (readButton()) {
     // clear strips before switching so old pixels don't bleed into new effect
-    fillStrip(1, 0, LED_COUNT, 0, 0, 0);
-    fillStrip(2, 0, LED_COUNT, 0, 0, 0);
+    clearStrips();
     patternIdx = (patternIdx < PATTERN_MAX) ? patternIdx + 1 : 0;
   }
 
   switch (patternIdx) {
-    case 0: fillStrip(1, 0, LED_COUNT, 0, 0, 0);
-            fillStrip(2, 0, LED_COUNT, 0, 0, 0);                    break;
+    case 0: clearStrips();                                          break;
     case 1: knightScanner(KNIGHT_BEAM_LEN, KNIGHT_SPEED);           break;
     case 2: policeLights(POLICE_SPEED);                             break;
     case 3: rainbow(RAINBOW_SPEED, RAINBOW_COLOR_LEN);              break;
@@ -166,8 +162,7 @@ void strobe(const int loopDelay, const CRGB color)
     fillStrip(1, 0, LED_COUNT, color.r, color.g, color.b);
     fillStrip(2, 0, LED_COUNT, color.r, color.g, color.b);
   } else {
-    fillStrip(1, 0, LED_COUNT, 0, 0, 0);
-    fillStrip(2, 0, LED_COUNT, 0, 0, 0);
+    clearStrips();
   }
 }
 
@@ -307,8 +302,7 @@ void policeLights(const int loopMax)
       fillStrip(1, 0, POLICE_SPLIT, 0, 0, 255);
       fillStrip(2, 0, POLICE_SPLIT, 0, 0, 255);
     } else {
-      fillStrip(1, 0, LED_COUNT, 0, 0, 0);
-      fillStrip(2, 0, LED_COUNT, 0, 0, 0);
+      clearStrips();
     }
     if (loopPulse) { flashCounter++; }
     if (flashCounter == FLASH_COUNT) { flashCounter = 0; step = 3; }
@@ -319,8 +313,7 @@ void policeLights(const int loopMax)
       fillStrip(1, POLICE_SPLIT + 1, LED_COUNT, 255, 0, 0);
       fillStrip(2, POLICE_SPLIT + 1, LED_COUNT, 255, 0, 0);
     } else {
-      fillStrip(1, 0, LED_COUNT, 0, 0, 0);
-      fillStrip(2, 0, LED_COUNT, 0, 0, 0);
+      clearStrips();
     }
     if (loopPulse) { flashCounter++; }
     if (flashCounter == FLASH_COUNT) {
@@ -448,6 +441,14 @@ float getSpeed()
   }
 
   return cachedSpeedKmh;
+}
+
+
+// Turn off all LEDs on both strips.
+void clearStrips()
+{
+  fillStrip(1, 0, LED_COUNT, 0, 0, 0);
+  fillStrip(2, 0, LED_COUNT, 0, 0, 0);
 }
 
 
