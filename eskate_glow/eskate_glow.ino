@@ -73,6 +73,17 @@ void setup()
   fillStrip(2, 0, LED_COUNT, 0, 0, 0);
   FastLED.show();
 
+  // startup indicator: run meteor for 2 s so the user knows the system booted
+  const uint32_t startupEnd = millis() + 2000;
+  while (millis() < startupEnd) {
+    meteorEffect(METEOR_SPEED);
+    FastLED.show();
+    delay(5);
+  }
+  fillStrip(1, 0, LED_COUNT, 0, 0, 0); // clear after startup animation
+  fillStrip(2, 0, LED_COUNT, 0, 0, 0);
+  FastLED.show();
+
   setupHallSensor();
 }
 
