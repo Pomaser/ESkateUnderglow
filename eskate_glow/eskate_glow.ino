@@ -1,87 +1,97 @@
+// add libraries
 #include <FastGPIO.h>
 #define APA102_USE_FAST_GPIO
 #include <APA102.h>
 
-// APA102 strip pins (SPI: data + clock per strip)
-const int PIN1_CLOCK = 9;
-const int PIN1_DATA  = 10;
-const int PIN2_CLOCK = 11;
-const int PIN2_DATA  = 12;
-
-// Pattern change button (active HIGH, external pull-down)
+// set pins
+const int PIN1_CLOCK         = 9;
+const int PIN1_DATA          = 10;
+const int PIN2_CLOCK         = 11;
+const int PIN2_DATA          = 12;
 const int PIN_CHANGE_PATTERN = 8;
 
+// create strips
 APA102<PIN1_DATA, PIN1_CLOCK> ledStrip1;
 APA102<PIN2_DATA, PIN2_CLOCK> ledStrip2;
 
-#define LED_COUNT 22                   // LEDs per strip
-const uint8_t GLOBAL_BRIGHTNESS = 10;  // master brightness 0-255
+// set LED count for strip
+#define LED_COUNT 22
 
-rgb_color leds1[LED_COUNT]; // strip 1: data pin 10, clock pin 9
-rgb_color leds2[LED_COUNT]; // strip 2: data pin 12, clock pin 11
+// create buffers for both strips
+rgb_color buffer1[LED_COUNT];
+rgb_color buffer2[LED_COUNT];
 
-const int PATTERN_MAX           = 6;   // highest pattern index
-const int DEFAULT_EFFECT        = 4;   // effect started when pin 8 is HIGH at boot (4 = breath)
-const int TIMOUT_BUTTON_CYCLES  = 200; // window for double-press detection
-const int STARTUP_DELAY_MS      = 40;  // let external pull-down settle
-const int DEBOUNCE_DELAY_MS     = 50;  // button debounce duration
-
-// Effect speed parameters (loop iterations per tick)
-const int KNIGHT_SPEED      = 15;
-const int POLICE_SPEED      = 25;
-const int RAINBOW_SPEED     = 15;
-const int BREATH_SPEED      = 25;
-const int STROBE_SPEED      = 20;
-const int METEOR_SPEED      = 8;
-
-// Effect shape/color parameters
-const int       KNIGHT_BEAM_LEN   = 14;
-const int       RAINBOW_COLOR_LEN = 10;
-const rgb_color STROBE_COLOR      = {200, 200, 200};
-const int       POLICE_SPLIT      = 11; // LED index dividing left/right half in split phase
+// create constants
+const int PATTERN_MAX          = 6;   // highest pattern index (added meteor)
+const int DEFAULT_EFFECT       = 4;   // effect started when pin 8 is HIGH at boot (4 = breath)
+const int GLOBAL_BRIGHTNESS    = 10;
+const int TIMOUT_BUTTON_CYCLES = 500;
 
 // Hall sensor — speed measurement (Meepo Mini 2 ER, LingYi hub motor)
 // Wiring: motor JST pin 1 (+5V) → 5V, pin 2 (GND) → GND, pin 3 (Hall A) → D2
-const uint8_t  HALL_PIN      = 2;     // D2 = INT0
-const uint8_t  POLE_PAIRS    = 14;    // motor pole pairs (Meepo 540W = 14)
-const float    WHEEL_MM      = 100.0; // wheel diameter [mm]
-const uint32_t CALC_PERIOD   = 500;   // speed recalculation interval [ms]
-const uint32_t ZERO_THRESH   = 3000;  // no pulse for this long → 0 km/h [ms]
-const float    WHEEL_CIRC_M  = (WHEEL_MM * PI) / 1000.0; // wheel circumference [m]
+const uint8_t  HALL_PIN     = 2;     // D2 = INT0
+const uint8_t  POLE_PAIRS   = 14;    // motor pole pairs (Meepo 540W = 14)
+const float    WHEEL_MM     = 100.0; // wheel diameter [mm]
+const uint32_t CALC_PERIOD  = 500;   // speed recalculation interval [ms]
+const uint32_t ZERO_THRESH  = 3000;  // no pulse for this long → 0 km/h [ms]
+const float    WHEEL_CIRC_M = (WHEEL_MM * PI) / 1000.0;
 
-// Shared timing state — written by loopCounter(), read by all effects
-bool loopPulse = false; // true for one iteration when the tick fires
-bool flipFlop  = false; // toggles each tick
-
-int patternIdx = 0; // active effect (0 = off, 1-PATTERN_MAX = effects)
+// create variables
+byte step = 0;
+int positionIdx = 0;
+int meteorPos = 0;
+int loopCnt = 0;
+int flashCounter = 0;
+int transitionCounter = 0;
+int intensity = 0;
+int buttonState = 0;
+int lastButtonState = 1;
+int patternIdx = 0;
+int buttonCounter = 0;
+int buttonTimer = 0;
+bool loopPulse = false;
+bool positiveDirection = true;
+bool flipFlop = false;
+bool intensityUp = false;
+bool changePattern;
 
 // Hall sensor ISR state — volatile because modified inside interrupt
-volatile uint32_t hallPulseCount  = 0; // total pulse count since boot
-volatile uint32_t hallLastPulseUs = 0; // timestamp of last pulse [µs]
+volatile uint32_t hallPulseCount  = 0;
+volatile uint32_t hallLastPulseUs = 0;
 
 
+// initialization stuff
 void setup()
 {
   pinMode(PIN_CHANGE_PATTERN, INPUT);
   pinMode(LED_BUILTIN, OUTPUT);
-  delay(STARTUP_DELAY_MS);
+  delay(40);
 
-  ledsOff();
-  ledStrip1.write(leds1, LED_COUNT, GLOBAL_BRIGHTNESS);
-  ledStrip2.write(leds2, LED_COUNT, GLOBAL_BRIGHTNESS);
+  // clear both strips
+  fillStrip(1, 0, LED_COUNT, 0, 0, 0);
+  fillStrip(2, 0, LED_COUNT, 0, 0, 0);
+  ledStrip1.write(buffer1, LED_COUNT, GLOBAL_BRIGHTNESS);
+  ledStrip2.write(buffer2, LED_COUNT, GLOBAL_BRIGHTNESS);
 
   // Startup indicator: run meteor for 2 s so the user knows the system booted
-  const uint32_t startupEnd = millis() + 2000;
+  uint32_t startupEnd = millis() + 2000;
   while (millis() < startupEnd) {
-    meteorEffect(METEOR_SPEED);
-    ledStrip1.write(leds1, LED_COUNT, GLOBAL_BRIGHTNESS);
-    ledStrip2.write(leds2, LED_COUNT, GLOBAL_BRIGHTNESS);
+    meteorEffect(8);
+    ledStrip1.write(buffer1, LED_COUNT, GLOBAL_BRIGHTNESS);
+    ledStrip2.write(buffer2, LED_COUNT, GLOBAL_BRIGHTNESS);
     delay(5);
   }
-  ledsOff();
-  ledStrip1.write(leds1, LED_COUNT, GLOBAL_BRIGHTNESS);
-  ledStrip2.write(leds2, LED_COUNT, GLOBAL_BRIGHTNESS);
 
+  // clear after startup animation
+  fillStrip(1, 0, LED_COUNT, 0, 0, 0);
+  fillStrip(2, 0, LED_COUNT, 0, 0, 0);
+  ledStrip1.write(buffer1, LED_COUNT, GLOBAL_BRIGHTNESS);
+  ledStrip2.write(buffer2, LED_COUNT, GLOBAL_BRIGHTNESS);
+
+  // read button state for first start
+  lastButtonState = digitalRead(PIN_CHANGE_PATTERN);
+
+  // start DEFAULT_EFFECT if button is held at boot
   if (digitalRead(PIN_CHANGE_PATTERN) == HIGH) {
     patternIdx = DEFAULT_EFFECT;
   }
@@ -90,207 +100,237 @@ void setup()
 }
 
 
+// main loop
 void loop()
 {
-  if (readButton()) {
-    // Clear strips before switching so old pixels don't bleed into new effect
-    ledsOff();
-    patternIdx = (patternIdx < PATTERN_MAX) ? patternIdx + 1 : 0;
+  // read change pattern input
+  buttonState = digitalRead(PIN_CHANGE_PATTERN);
+
+  // copy state to output LED
+  if ( buttonState == 1 ) {
+    digitalWrite(LED_BUILTIN, HIGH);
+  } else {
+    digitalWrite(LED_BUILTIN, LOW);
   }
 
-  switch (patternIdx) {
-    case 0: ledsOff();                                              break;
-    case 1: knightScanner(KNIGHT_BEAM_LEN, KNIGHT_SPEED);           break;
-    case 2: policeLights(POLICE_SPEED);                             break;
-    case 3: rainbow(RAINBOW_SPEED, RAINBOW_COLOR_LEN);              break;
-    case 4: breathEffect(BREATH_SPEED);                             break;
-    case 5: strobe(STROBE_SPEED, STROBE_COLOR);                     break;
-    case 6: meteorEffect(METEOR_SPEED);                             break;
-    default: patternIdx = 0;                                        break;
-  }
-
-  ledStrip1.write(leds1, LED_COUNT, GLOBAL_BRIGHTNESS); // send frame to hardware
-  ledStrip2.write(leds2, LED_COUNT, GLOBAL_BRIGHTNESS);
-
-  float speed = getSpeed(); // TODO: use speed to drive effects
-  (void)speed;              // suppress unused variable warning
-}
-
-
-// Returns true when a double-press is detected within TIMOUT_BUTTON_CYCLES iterations.
-// Mirrors button state onto the built-in LED for visual feedback.
-bool readButton()
-{
-  static int lastButtonState = 1;
-  static int buttonCounter   = 0;
-  static int buttonTimer     = 0;
-
-  const int buttonState = digitalRead(PIN_CHANGE_PATTERN);
-
-  digitalWrite(LED_BUILTIN, buttonState ? HIGH : LOW);
-
+  // compare the buttonState to its previous state
   if (buttonState != lastButtonState) {
+
+    // rising edge of button
     if (buttonState == HIGH) {
-      buttonCounter++; // count rising edges
+      buttonCounter++;
     }
-    delay(DEBOUNCE_DELAY_MS);
+    // avoid bouncing
+    delay(50);
   }
+
+  // save the current state as the last state, for next time through the loop
   lastButtonState = buttonState;
 
-  if (buttonCounter > 0) {
-    buttonTimer++; // counts iterations since first press
+  // count cycles
+  if ( buttonCounter > 0 ) {
+    buttonTimer++;
   }
 
-  // Timeout — discard incomplete press sequence
-  if (buttonTimer > TIMOUT_BUTTON_CYCLES) {
+  // reset cycle counter
+  if ( buttonTimer > TIMOUT_BUTTON_CYCLES ) {
     buttonCounter = 0;
-    buttonTimer   = 0;
+    buttonTimer = 0;
   }
 
-  if ((buttonTimer < TIMOUT_BUTTON_CYCLES) && (buttonCounter > 1)) {
+  // change pattern signal after some presses
+  if (( buttonTimer < TIMOUT_BUTTON_CYCLES ) && ( buttonCounter > 1 )) {
+    changePattern = true;
     buttonCounter = 0;
-    buttonTimer   = 0;
-    return true;
+    buttonTimer = 0;
   }
 
-  return false;
+  // change pattern index
+  if (changePattern == true ) {
+
+    // erase old effect
+    fillStrip(1, 0, LED_COUNT, 0, 0, 0);
+    fillStrip(2, 0, LED_COUNT, 0, 0, 0);
+    changePattern = false;
+
+    // change pattern
+    if (patternIdx < PATTERN_MAX ) {
+      patternIdx++;
+    } else {
+      patternIdx = 0;
+    }
+  }
+
+  // switch patterns
+  switch (patternIdx) {
+    case 0:
+      fillStrip(1, 0, LED_COUNT, 0, 0, 0);
+      fillStrip(2, 0, LED_COUNT, 0, 0, 0);
+      break;
+    case 1:
+      knightScanner(14, 15);
+      break;
+    case 2:
+      policeLights(25);
+      break;
+    case 3:
+      rainbow(15, 10);
+      break;
+    case 4:
+      breathEffect(25);
+      break;
+    case 5:
+      strobe(20, rgb_color(200, 200, 200));
+      break;
+    case 6:
+      meteorEffect(8);
+      break;
+    default:
+      patternIdx = 0;
+      break;
+  }
+
+  // write to outputs
+  ledStrip1.write(buffer1, LED_COUNT, GLOBAL_BRIGHTNESS);
+  ledStrip2.write(buffer2, LED_COUNT, GLOBAL_BRIGHTNESS);
+
+  float speed = getSpeed(); // TODO: use speed to drive effects
+  (void)speed;
 }
 
 
-// Rapid on/off flash at the given speed.
-void strobe(const int loopDelay, const rgb_color color)
-{
+void strobe(int loopDelay, rgb_color color) {
+
   loopCounter(loopDelay);
 
-  // Use flipFlop directly for on/off — it toggles each tick
-  if (!flipFlop) {
-    fillStrip(1, 0, LED_COUNT, color.red, color.green, color.blue);
-    fillStrip(2, 0, LED_COUNT, color.red, color.green, color.blue);
-  } else {
-    ledsOff();
+  if (loopPulse == false) {
+    if (flipFlop == false) {
+      fillStrip(1, 0, LED_COUNT, color.red, color.green, color.blue);
+      fillStrip(2, 0, LED_COUNT, color.red, color.green, color.blue);
+    } else {
+      fillStrip(1, 0, LED_COUNT, 0, 0, 0);
+      fillStrip(2, 0, LED_COUNT, 0, 0, 0);
+    }
   }
 }
 
 
-// Scrolling rainbow: inserts a new color at index 0 each tick and shifts the rest down.
-void rainbow(const int loopDelay, const byte colorLen)
-{
-  static byte step              = 0;
-  static int  transitionCounter = 0;
-
-  // Clamp colorLen to a valid range without modifying the input parameter
-  const byte effectiveLen = constrain(colorLen, 1, LED_COUNT - 1);
+// rainbow effect
+void rainbow(int loopDelay, byte colorLen) {
 
   loopCounter(loopDelay);
 
-  if (loopPulse) {
+  if (loopPulse == true) {
 
     switch (step) {
-      case 0: leds1[0] = {148, 0, 211}; break; // violet
-      case 1: leds1[0] = {75, 0, 130};  break; // indigo
-      case 2: leds1[0] = {0, 0, 255};   break; // blue
-      case 3: leds1[0] = {0, 255, 0};   break; // green
-      case 4: leds1[0] = {255, 255, 0}; break; // yellow
-      case 5: leds1[0] = {255, 127, 0}; break; // orange
-      case 6: leds1[0] = {255, 0, 0};   break; // red
-      default: step = 0;                break;
+      case 0: buffer1[0] = rgb_color(148, 0, 211); break; // violet
+      case 1: buffer1[0] = rgb_color(75, 0, 130);  break; // indigo
+      case 2: buffer1[0] = rgb_color(0, 0, 255);   break; // blue
+      case 3: buffer1[0] = rgb_color(0, 255, 0);   break; // green
+      case 4: buffer1[0] = rgb_color(255, 255, 0); break; // yellow
+      case 5: buffer1[0] = rgb_color(255, 127, 0); break; // orange
+      case 6: buffer1[0] = rgb_color(255, 0, 0);   break; // red
+      default: step = 0;                            break;
     }
 
-    // Hold each color for effectiveLen ticks before advancing
-    if (transitionCounter < effectiveLen) {
+    colorLen = constrain(colorLen, 1, LED_COUNT - 1);
+    if ( transitionCounter < colorLen ) {
       transitionCounter++;
     } else {
       step++;
       transitionCounter = 0;
     }
 
-    // Shift strip towards the end
     for (int idx = LED_COUNT - 1; idx > 0; idx--) {
-      leds1[idx] = leds1[idx - 1];
+      buffer1[idx] = buffer1[idx - 1];
     }
 
-    memcpy(leds2, leds1, sizeof(leds2)); // mirror strip 1 to strip 2
+    memcpy(buffer2, buffer1, sizeof(buffer2));
   }
 }
 
 
-// Red scanning beam that bounces end-to-end, Knight Rider style.
-void knightScanner(const int beamLen, const int loopMax)
+// Knight rider scanner effect
+void knightScanner(int beamLen, int loopMax)
 {
-  static int  positionIdx       = 0;
-  static bool positiveDirection = true;
-
   rgb_color beamShape[beamLen];
-  const int BEAM_OFFSET = beamLen - 1; // extra range so beam fully enters/exits the strip
+  const int BEAM_OFFSET = beamLen - 1;
 
-  // Build brightness gradient: full at head, zero at tail
-  const float beamSpread = 255.0 / (beamLen - 1);
+  float beamSpread = 255.0 / (beamLen - 1);
+  int beamStep = 0;
   for (int idx = 0; idx < beamLen; idx++) {
-    const int beamStep = (idx < beamLen - 1) ? 255 - (idx * beamSpread) : 0;
-    beamShape[idx] = {(uint8_t)beamStep, 0, 0};
+    if ( idx < (beamLen - 1) ) {
+      beamStep = 255 - (idx * beamSpread);
+    } else {
+      beamStep = 0;
+    }
+    beamShape[idx].red   = beamStep;
+    beamShape[idx].green = 0;
+    beamShape[idx].blue  = 0;
   }
 
   loopCounter(loopMax);
 
-  // Advance position each tick, reverse at strip boundaries
-  if ((positionIdx < LED_COUNT + BEAM_OFFSET - 1) && positiveDirection) {
-    if (loopPulse) { positionIdx++; }
+  if ( (positionIdx < LED_COUNT + BEAM_OFFSET - 1) && (positiveDirection == true) ) {
+    if (loopPulse == true) { positionIdx++; }
   } else {
     positiveDirection = false;
   }
 
-  if ((positionIdx > -BEAM_OFFSET) && !positiveDirection) {
-    if (loopPulse) { positionIdx--; }
+  if ( (positionIdx > 0 - BEAM_OFFSET) && (positiveDirection == false) ) {
+    if (loopPulse == true) { positionIdx--; }
   } else {
     positiveDirection = true;
   }
 
-  // Paint beam onto LED arrays (skip out-of-range indices)
-  if (positiveDirection) {
+  if ( positiveDirection == true ) {
     for (int idx = 0; idx < beamLen; idx++) {
-      const int copyPos = positionIdx - idx;
-      if (copyPos >= 0 && copyPos < LED_COUNT) {
-        leds1[copyPos] = beamShape[idx];
-        leds2[copyPos] = beamShape[idx];
+      int copyPos = positionIdx - idx;
+      if ( (copyPos < LED_COUNT) && (copyPos >= 0) ) {
+        buffer1[copyPos] = beamShape[idx];
+        buffer2[copyPos] = beamShape[idx];
       }
     }
   } else {
     for (int idx = 0; idx < beamLen; idx++) {
-      const int copyPos = positionIdx + idx;
-      if (copyPos >= 0 && copyPos < LED_COUNT) {
-        leds1[copyPos] = beamShape[idx];
-        leds2[copyPos] = beamShape[idx];
+      int copyPos = positionIdx + idx;
+      if ( (copyPos < LED_COUNT) && (copyPos >= 0) ) {
+        buffer1[copyPos] = beamShape[idx];
+        buffer2[copyPos] = beamShape[idx];
       }
     }
   }
 }
 
 
-// Alternating red/blue police-style flash sequence.
-// Sequence: red solo → blue solo (repeated TRANSITION_COUNT times) → blue split → red split → repeat.
-void policeLights(const int loopMax)
-{
-  static byte step              = 0;
-  static int  flashCounter      = 0;
-  static int  transitionCounter = 0;
+// police lights
+void policeLights(int loopMax) {
 
-  const int FLASH_COUNT      = 8;  // flashes per phase before advancing
-  const int TRANSITION_COUNT = 10; // red/blue alternation cycles before split phase
+  const int FLASH_COUNT      = 8;
+  const int TRANSITION_COUNT = 10;
 
   loopCounter(loopMax);
 
   switch (step) {
 
-  case 0: // flash strip 1 RED
-    fillStrip(1, 0, LED_COUNT, flipFlop ? 255 : 0, 0, 0);
-    if (loopPulse) { flashCounter++; }
-    if (flashCounter == FLASH_COUNT) { flashCounter = 0; step = 1; }
+  case 0:
+    if ( flipFlop == true ) {
+      fillStrip(1, 0, LED_COUNT, 255, 0, 0);
+    } else {
+      fillStrip(1, 0, LED_COUNT, 0, 0, 0);
+    }
+    if ( loopPulse == true ) { flashCounter++; }
+    if ( flashCounter == FLASH_COUNT ) { flashCounter = 0; step = 1; }
     break;
 
-  case 1: // flash strip 2 BLUE
-    fillStrip(2, 0, LED_COUNT, 0, 0, flipFlop ? 255 : 0);
-    if (loopPulse) { flashCounter++; }
-    if (flashCounter == FLASH_COUNT) {
+  case 1:
+    if ( flipFlop == true ) {
+      fillStrip(2, 0, LED_COUNT, 0, 0, 255);
+    } else {
+      fillStrip(2, 0, LED_COUNT, 0, 0, 0);
+    }
+    if ( loopPulse == true ) { flashCounter++; }
+    if ( flashCounter == FLASH_COUNT ) {
       flashCounter = 0;
       if (transitionCounter == TRANSITION_COUNT) {
         transitionCounter = 0;
@@ -302,26 +342,28 @@ void policeLights(const int loopMax)
     }
     break;
 
-  case 2: // flash left half of both strips BLUE
-    if (flipFlop) {
-      fillStrip(1, 0, POLICE_SPLIT, 0, 0, 255);
-      fillStrip(2, 0, POLICE_SPLIT, 0, 0, 255);
+  case 2:
+    if ( flipFlop == true ) {
+      fillStrip(1, 0, 11, 0, 0, 255);
+      fillStrip(2, 0, 11, 0, 0, 255);
     } else {
-      ledsOff();
+      fillStrip(1, 0, LED_COUNT, 0, 0, 0);
+      fillStrip(2, 0, LED_COUNT, 0, 0, 0);
     }
-    if (loopPulse) { flashCounter++; }
-    if (flashCounter == FLASH_COUNT) { flashCounter = 0; step = 3; }
+    if ( loopPulse == true ) { flashCounter++; }
+    if ( flashCounter == FLASH_COUNT ) { flashCounter = 0; step = 3; }
     break;
 
-  case 3: // flash right half of both strips RED
-    if (flipFlop) {
-      fillStrip(1, POLICE_SPLIT + 1, LED_COUNT, 255, 0, 0);
-      fillStrip(2, POLICE_SPLIT + 1, LED_COUNT, 255, 0, 0);
+  case 3:
+    if ( flipFlop == true ) {
+      fillStrip(1, 12, LED_COUNT, 255, 0, 0);
+      fillStrip(2, 12, LED_COUNT, 255, 0, 0);
     } else {
-      ledsOff();
+      fillStrip(1, 0, LED_COUNT, 0, 0, 0);
+      fillStrip(2, 0, LED_COUNT, 0, 0, 0);
     }
-    if (loopPulse) { flashCounter++; }
-    if (flashCounter == FLASH_COUNT) {
+    if ( loopPulse == true ) { flashCounter++; }
+    if ( flashCounter == FLASH_COUNT ) {
       flashCounter = 0;
       if (transitionCounter == TRANSITION_COUNT) {
         transitionCounter = 0;
@@ -339,71 +381,69 @@ void policeLights(const int loopMax)
 }
 
 
-// Purple linear breathing: intensity ramps up and down between MIN and MAX.
-void breathEffect(const int loopMax)
-{
-  const int MIN_INTENSITY = 0;  // color component at breath valley
-  const int MAX_INTENSITY = 80; // color component at breath peak
+void breathEffect(int loopMax) {
 
-  static int  intensity   = 0;
-  static bool intensityUp = false;
+  const int MIN_INTENSITY = 0;
+  const int MAX_INTENSITY = 80;
 
   loopCounter(loopMax);
 
-  if (loopPulse) {
-    if (!intensityUp) {
-      if (intensity < MAX_INTENSITY) {
-        intensity += 2;
-      } else {
-        intensityUp = true;
+  if ( intensityUp == false ) {
+    if ( intensity < MAX_INTENSITY ) {
+      if ( loopPulse == true ) {
+        fillStrip(1, 0, LED_COUNT, intensity, 0, intensity);
+        fillStrip(2, 0, LED_COUNT, intensity, 0, intensity);
+        intensity = intensity + 2;
       }
     } else {
-      if (intensity > MIN_INTENSITY) {
-        intensity -= 2;
-      } else {
-        intensityUp = false;
-      }
+      intensityUp = not intensityUp;
     }
-    fillStrip(1, 0, LED_COUNT, intensity, 0, intensity);
-    fillStrip(2, 0, LED_COUNT, intensity, 0, intensity);
+  } else {
+    if ( intensity > MIN_INTENSITY ) {
+      if ( loopPulse == true ) {
+        fillStrip(1, 0, LED_COUNT, intensity, 0, intensity);
+        fillStrip(2, 0, LED_COUNT, intensity, 0, intensity);
+        intensity = intensity - 2;
+      }
+    } else {
+      intensityUp = not intensityUp;
+    }
   }
 }
 
 
-// Blue-white shooting star: bright head with a fading trail that decays each tick.
-void meteorEffect(const int loopMax)
-{
-  const int     METEOR_SIZE = 5;   // number of LEDs in the meteor body
-  const uint8_t TRAIL_DECAY = 192; // scale factor per tick: higher = longer trail
+// Blue-white shooting star: bright head with a fading trail.
+void meteorEffect(int loopMax) {
 
-  static int pos = 0;
+  const int     METEOR_SIZE  = 5;   // number of LEDs in the meteor body
+  const uint8_t TRAIL_DECAY  = 192; // scale factor per tick: higher = longer trail
 
   loopCounter(loopMax);
 
-  if (loopPulse) {
+  if (loopPulse == true) {
 
     // Decay all pixels to extend the fading trail
     for (int i = 0; i < LED_COUNT; i++) {
-      leds1[i].red   = (uint8_t)((leds1[i].red   * TRAIL_DECAY) >> 8);
-      leds1[i].green = (uint8_t)((leds1[i].green * TRAIL_DECAY) >> 8);
-      leds1[i].blue  = (uint8_t)((leds1[i].blue  * TRAIL_DECAY) >> 8);
-      leds2[i].red   = (uint8_t)((leds2[i].red   * TRAIL_DECAY) >> 8);
-      leds2[i].green = (uint8_t)((leds2[i].green * TRAIL_DECAY) >> 8);
-      leds2[i].blue  = (uint8_t)((leds2[i].blue  * TRAIL_DECAY) >> 8);
+      buffer1[i].red   = (uint8_t)((buffer1[i].red   * TRAIL_DECAY) >> 8);
+      buffer1[i].green = (uint8_t)((buffer1[i].green * TRAIL_DECAY) >> 8);
+      buffer1[i].blue  = (uint8_t)((buffer1[i].blue  * TRAIL_DECAY) >> 8);
+      buffer2[i].red   = (uint8_t)((buffer2[i].red   * TRAIL_DECAY) >> 8);
+      buffer2[i].green = (uint8_t)((buffer2[i].green * TRAIL_DECAY) >> 8);
+      buffer2[i].blue  = (uint8_t)((buffer2[i].blue  * TRAIL_DECAY) >> 8);
     }
 
     // Draw meteor: full brightness at head, dimming toward tail
     for (int j = 0; j < METEOR_SIZE; j++) {
-      const int idx = pos - j;
+      int idx = meteorPos - j;
       if (idx >= 0 && idx < LED_COUNT) {
-        const uint8_t bright = 255 - (j * (255 / METEOR_SIZE));
-        leds1[idx] = {bright, bright, 255};
-        leds2[idx] = {bright, bright, 255};
+        uint8_t bright = 255 - (j * (255 / METEOR_SIZE));
+        buffer1[idx] = rgb_color(bright, bright, 255);
+        buffer2[idx] = rgb_color(bright, bright, 255);
       }
     }
 
-    if (++pos >= LED_COUNT + METEOR_SIZE) {
-      pos = 0; // reset once meteor fully exits the strip
+    if (++meteorPos >= LED_COUNT + METEOR_SIZE) {
+      meteorPos = 0;
     }
   }
 }
@@ -417,7 +457,7 @@ void onHallPulse()
 }
 
 
-// Attach interrupt to HALL_PIN. Call once from setup() when speed reading is needed.
+// Attach interrupt to HALL_PIN. Call once from setup().
 void setupHallSensor()
 {
   pinMode(HALL_PIN, INPUT); // ESC provides pull-up via sensor connector
@@ -425,8 +465,7 @@ void setupHallSensor()
 }
 
 
-// Returns current speed in km/h.
-// Recalculates every CALC_PERIOD ms; returns cached value between periods.
+// Returns current speed in km/h. Recalculates every CALC_PERIOD ms.
 // Returns 0.0 if no pulse received within ZERO_THRESH ms.
 float getSpeed()
 {
@@ -434,66 +473,59 @@ float getSpeed()
   static uint32_t prevPulseSnap  = 0;
   static float    cachedSpeedKmh = 0.0;
 
-  const uint32_t now = millis();
+  uint32_t now = millis();
   if (now - prevCalcTime < CALC_PERIOD) {
     return cachedSpeedKmh;
   }
 
-  // Atomically snapshot and reset pulse counter
   noInterrupts();
-  const uint32_t pulses      = hallPulseCount - prevPulseSnap;
-  prevPulseSnap              = hallPulseCount;
-  const uint32_t lastPulseUs = hallLastPulseUs;
+  uint32_t pulses      = hallPulseCount - prevPulseSnap;
+  prevPulseSnap        = hallPulseCount;
+  uint32_t lastPulseUs = hallLastPulseUs;
   interrupts();
 
-  const float dt_s = (now - prevCalcTime) / 1000.0;
-  prevCalcTime     = now;
+  float dt_s   = (now - prevCalcTime) / 1000.0;
+  prevCalcTime = now;
 
-  // No pulse received within ZERO_THRESH → board is stopped
-  const bool stopped = ((now - (lastPulseUs / 1000)) > ZERO_THRESH);
+  bool stopped = ((now - (lastPulseUs / 1000)) > ZERO_THRESH);
 
   if (stopped || pulses == 0) {
     cachedSpeedKmh = 0.0;
   } else {
-    // rps = pulses / (POLE_PAIRS * dt)
-    // speed [km/h] = rps * circumference [m] * 3.6
-    const float rps = (float)pulses / ((float)POLE_PAIRS * dt_s);
-    cachedSpeedKmh  = rps * WHEEL_CIRC_M * 3.6;
+    float rps      = (float)pulses / ((float)POLE_PAIRS * dt_s);
+    cachedSpeedKmh = rps * WHEEL_CIRC_M * 3.6;
   }
 
   return cachedSpeedKmh;
 }
 
 
-// Turn off all LEDs on both strips.
-void ledsOff()
-{
-  fillStrip(1, 0, LED_COUNT, 0, 0, 0);
-  fillStrip(2, 0, LED_COUNT, 0, 0, 0);
-}
-
-
-// Fill LEDs [from, to) on the given strip (1 or 2) with a solid color.
-void fillStrip(const byte stripNo, const int from, const int to, const uint8_t r, const uint8_t g, const uint8_t b)
+// fill strip with single color
+void fillStrip(byte stripNo, int from, int to, uint8_t r, uint8_t g, uint8_t b)
 {
   for (int i = from; i < to; i++) {
-    if (stripNo == 1) { leds1[i].red = r; leds1[i].green = g; leds1[i].blue = b; }
-    if (stripNo == 2) { leds2[i].red = r; leds2[i].green = g; leds2[i].blue = b; }
+    if ( stripNo == 1 ) {
+      buffer1[i].red   = r;
+      buffer1[i].green = g;
+      buffer1[i].blue  = b;
+    }
+    if ( stripNo == 2 ) {
+      buffer2[i].red   = r;
+      buffer2[i].green = g;
+      buffer2[i].blue  = b;
+    }
   }
 }
 
 
-// Tick divider: sets loopPulse=true and toggles flipFlop every loopMax calls.
-void loopCounter(const int loopMax)
-{
-  static int loopCnt = 0;
-
-  if (loopCnt < loopMax) {
+// loop counter
+void loopCounter(int loopMax) {
+  if ( loopCnt < loopMax ) {
     loopCnt++;
     loopPulse = false;
   } else {
     loopCnt   = 0;
     loopPulse = true;
-    flipFlop  = !flipFlop;
+    flipFlop  = not flipFlop;
   }
 }
