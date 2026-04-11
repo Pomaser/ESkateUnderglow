@@ -16,6 +16,7 @@ CRGB leds1[LED_COUNT]; // strip 1: data pin 10, clock pin 9
 CRGB leds2[LED_COUNT]; // strip 2: data pin 12, clock pin 11
 
 const int PATTERN_MAX           = 6;   // highest pattern index
+const int DEFAULT_EFFECT        = 4;   // effect started when pin 8 is HIGH at boot (4 = breath)
 const int TIMOUT_BUTTON_CYCLES  = 200; // window for double-press detection
 const int STARTUP_DELAY_MS      = 40;  // let external pull-down settle
 const int DEBOUNCE_DELAY_MS     = 50;  // button debounce duration
@@ -24,7 +25,7 @@ const int DEBOUNCE_DELAY_MS     = 50;  // button debounce duration
 const int KNIGHT_SPEED      = 15;
 const int POLICE_SPEED      = 25;
 const int RAINBOW_SPEED     = 15;
-const int BREATH_SPEED      = 25;
+const int BREATH_SPEED      = 8;
 const int STROBE_SPEED      = 20;
 const int METEOR_SPEED      = 8;
 
@@ -64,6 +65,7 @@ void setup()
   FastLED.addLeds<APA102, PIN2_DATA, PIN2_CLOCK, BGR>(leds2, LED_COUNT);
 #endif
   FastLED.setBrightness(GLOBAL_BRIGHTNESS);
+  FastLED.setDither(DISABLE_DITHER);
 
   pinMode(PIN_CHANGE_PATTERN, INPUT);
   pinMode(LED_BUILTIN, OUTPUT);
@@ -81,6 +83,10 @@ void setup()
   }
   ledsOff(); // clear after startup animation
   FastLED.show();
+
+  if (digitalRead(PIN_CHANGE_PATTERN) == HIGH) {
+    patternIdx = DEFAULT_EFFECT;
+  }
 
   setupHallSensor();
 }
@@ -337,7 +343,7 @@ void policeLights(const int loopMax)
 // Purple sine-wave breathing: intensity oscillates between MIN and MAX using sin8.
 void breathEffect(const int loopMax)
 {
-  const uint8_t MIN_INTENSITY = 10; // color component 0-255 at breath valley
+  const uint8_t MIN_INTENSITY = 0;  // color component 0-255 at breath valley
   const uint8_t MAX_INTENSITY = 80; // color component 0-255 at breath peak
 
   static uint8_t theta = 0;

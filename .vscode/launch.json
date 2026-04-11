@@ -1,0 +1,13 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Arduino: Deploy to Nano",
+      "type": "node",
+      "request": "launch",
+      "preLaunchTask": "Arduino: Upload",
+      "program": "${workspaceFolder}",
+      "console": "integratedTerminal"
+    }
+  ]
+}

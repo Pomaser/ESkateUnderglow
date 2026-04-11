@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 690" font-family="'Courier New', monospace">
+
+  <!-- Background -->
+  <rect width="1000" height="690" fill="#f1f5f9" rx="8"/>
+
+  <!-- ═══════════════ TITLE ═══════════════ -->
+  <text x="500" y="28" text-anchor="middle" font-size="17" font-weight="bold" fill="#0f172a">ESkate Underglow — Wiring Overview</text>
+  <text x="500" y="46" text-anchor="middle" font-size="10" fill="#64748b">Meepo Mini 2 · Arduino Nano · 2× APA102 22-LED Strip · Button · Hall Sensor</text>
+
+  <!-- ═══════════════ WIRES (drawn first, behind components) ═══════════════ -->
+
+  <!-- Hall → Nano top: GND black, 5V red, D2 green -->
+  <line x1="432" y1="155" x2="432" y2="207" stroke="#374151" stroke-width="2.5"/>
+  <line x1="500" y1="155" x2="500" y2="207" stroke="#dc2626" stroke-width="2.5"/>
+  <line x1="568" y1="155" x2="568" y2="207" stroke="#16a34a" stroke-width="2.5"/>
+
+  <!-- Nano left → Strip 1: CLK yellow, DATA blue, 5V red, GND black -->
+  <line x1="285" y1="292" x2="388" y2="292" stroke="#ca8a04" stroke-width="2.5"/>
+  <line x1="285" y1="317" x2="388" y2="317" stroke="#2563eb" stroke-width="2.5"/>
+  <line x1="285" y1="342" x2="388" y2="342" stroke="#dc2626" stroke-width="2.5"/>
+  <line x1="285" y1="367" x2="388" y2="367" stroke="#374151" stroke-width="2.5"/>
+
+  <!-- Nano right → Strip 2: CLK yellow, DATA blue, 5V red, GND black -->
+  <line x1="612" y1="292" x2="715" y2="292" stroke="#ca8a04" stroke-width="2.5"/>
+  <line x1="612" y1="317" x2="715" y2="317" stroke="#2563eb" stroke-width="2.5"/>
+  <line x1="612" y1="342" x2="715" y2="342" stroke="#dc2626" stroke-width="2.5"/>
+  <line x1="612" y1="367" x2="715" y2="367" stroke="#374151" stroke-width="2.5"/>
+
+  <!-- Nano bottom D8 → button left pin (orange) -->
+  <line x1="452" y1="480" x2="452" y2="530" stroke="#ea580c" stroke-width="2.5"/>
+  <!-- junction dot -->
+  <circle cx="452" cy="508" r="4" fill="#ea580c"/>
+  <!-- pull-down branch: from junction left to resistor top -->
+  <line x1="452" y1="508" x2="395" y2="508" stroke="#374151" stroke-width="2"/>
+  <line x1="395" y1="508" x2="395" y2="518" stroke="#374151" stroke-width="2"/>
+  <!-- resistor body -->
+  <rect x="383" y="518" width="24" height="32" rx="3" fill="#fef9c3" stroke="#374151" stroke-width="1.5"/>
+  <text x="395" y="530" text-anchor="middle" font-size="8" fill="#374151">10k</text>
+  <text x="395" y="541" text-anchor="middle" font-size="8" fill="#374151">Ω</text>
+  <!-- resistor bottom → GND symbol -->
+  <line x1="395" y1="550" x2="395" y2="560" stroke="#374151" stroke-width="2"/>
+  <line x1="381" y1="560" x2="409" y2="560" stroke="#374151" stroke-width="2.5"/>
+  <line x1="385" y1="564" x2="405" y2="564" stroke="#374151" stroke-width="2"/>
+  <line x1="389" y1="568" x2="401" y2="568" stroke="#374151" stroke-width="1.5"/>
+  <text x="395" y="582" text-anchor="middle" font-size="9" fill="#374151">GND</text>
+
+  <!-- Button right pin → +5V label (short stub up) -->
+  <line x1="538" y1="530" x2="538" y2="515" stroke="#dc2626" stroke-width="2.5"/>
+  <text x="548" y="512" font-size="9" fill="#dc2626" font-weight="bold">+5V</text>
+
+  <!-- ═══════════════ HALL SENSOR JST ═══════════════ -->
+  <rect x="388" y="60" width="224" height="95" rx="6" fill="#fef3c7" stroke="#d97706" stroke-width="2.5"/>
+  <text x="500" y="80" text-anchor="middle" font-size="12" font-weight="bold" fill="#92400e">HALL SENSOR (JST 3-pin)</text>
+  <text x="500" y="95" text-anchor="middle" font-size="9" fill="#78350f">LingYi hub motor · JST connector on motor cable</text>
+  <!-- Pin labels -->
+  <text x="432" y="115" text-anchor="middle" font-size="9" fill="#374151">pin 1</text>
+  <text x="432" y="127" text-anchor="middle" font-size="9" fill="#dc2626">+5V</text>
+  <text x="500" y="115" text-anchor="middle" font-size="9" fill="#374151">pin 2</text>
+  <text x="500" y="127" text-anchor="middle" font-size="9" fill="#6b7280">GND</text>
+  <text x="568" y="115" text-anchor="middle" font-size="9" fill="#374151">pin 3</text>
+  <text x="568" y="127" text-anchor="middle" font-size="9" fill="#16a34a">Hall A</text>
+  <!-- Pin circles at bottom of JST box -->
+  <circle cx="432" cy="147" r="5" fill="#fbbf24" stroke="#92400e" stroke-width="1.5"/>
+  <circle cx="500" cy="147" r="5" fill="#fbbf24" stroke="#92400e" stroke-width="1.5"/>
+  <circle cx="568" cy="147" r="5" fill="#fbbf24" stroke="#92400e" stroke-width="1.5"/>
+
+  <!-- ═══════════════ ARDUINO NANO ═══════════════ -->
+  <rect x="388" y="207" width="224" height="273" rx="6" fill="#1e3a5f" stroke="#3b82f6" stroke-width="2.5"/>
+  <text x="500" y="228" text-anchor="middle" font-size="13" font-weight="bold" fill="#93c5fd">ARDUINO NANO</text>
+  <!-- inner chip -->
+  <rect x="418" y="237" width="164" height="210" rx="4" fill="#172554" stroke="#1d4ed8" stroke-width="1"/>
+  <text x="500" y="348" text-anchor="middle" font-size="9" fill="#3b82f6">ATmega328P</text>
+
+  <!-- Left pin labels (inside, right side of left wall) -->
+  <text x="420" y="296" font-size="9" fill="#fbbf24">D9  CLK1  →</text>
+  <text x="420" y="321" font-size="9" fill="#60a5fa">D10 DATA1 →</text>
+  <text x="420" y="346" font-size="9" fill="#f87171">5V        →</text>
+  <text x="420" y="371" font-size="9" fill="#94a3b8">GND       →</text>
+
+  <!-- Right pin labels (inside, left side of right wall) -->
+  <text x="580" y="296" text-anchor="end" font-size="9" fill="#fbbf24">← D11 CLK2</text>
+  <text x="580" y="321" text-anchor="end" font-size="9" fill="#60a5fa">← D12 DATA2</text>
+  <text x="580" y="346" text-anchor="end" font-size="9" fill="#f87171">← 5V</text>
+  <text x="580" y="371" text-anchor="end" font-size="9" fill="#94a3b8">← GND</text>
+
+  <!-- Top pin labels (inside nano, bottom of top row) -->
+  <text x="432" y="249" text-anchor="middle" font-size="8" fill="#94a3b8">GND</text>
+  <text x="500" y="249" text-anchor="middle" font-size="8" fill="#f87171">5V</text>
+  <text x="568" y="249" text-anchor="middle" font-size="8" fill="#4ade80">D2(INT0)</text>
+
+  <!-- Bottom pin labels -->
+  <text x="452" y="470" text-anchor="middle" font-size="8" fill="#fb923c">D8</text>
+  <text x="452" y="460" text-anchor="middle" font-size="7" fill="#fb923c">(BTN)</text>
+
+  <!-- Pin dots on nano edges -->
+  <!-- Left -->
+  <circle cx="389" cy="292" r="3" fill="#fbbf24"/>
+  <circle cx="389" cy="317" r="3" fill="#60a5fa"/>
+  <circle cx="389" cy="342" r="3" fill="#f87171"/>
+  <circle cx="389" cy="367" r="3" fill="#94a3b8"/>
+  <!-- Right -->
+  <circle cx="611" cy="292" r="3" fill="#fbbf24"/>
+  <circle cx="611" cy="317" r="3" fill="#60a5fa"/>
+  <circle cx="611" cy="342" r="3" fill="#f87171"/>
+  <circle cx="611" cy="367" r="3" fill="#94a3b8"/>
+  <!-- Top -->
+  <circle cx="432" cy="208" r="3" fill="#94a3b8"/>
+  <circle cx="500" cy="208" r="3" fill="#f87171"/>
+  <circle cx="568" cy="208" r="3" fill="#4ade80"/>
+  <!-- Bottom -->
+  <circle cx="452" cy="479" r="3" fill="#fb923c"/>
+
+  <!-- ═══════════════ LED STRIP 1 ═══════════════ -->
+  <rect x="63" y="252" width="222" height="145" rx="6" fill="#14532d" stroke="#22c55e" stroke-width="2.5"/>
+  <text x="174" y="272" text-anchor="middle" font-size="12" font-weight="bold" fill="#86efac">LED STRIP 1</text>
+  <text x="174" y="286" text-anchor="middle" font-size="9" fill="#4ade80">22× APA102 · DATA=D10 · CLK=D9</text>
+  <!-- LED visualization: 2 rows of 11 -->
+  <g fill="#4ade80" opacity="0.75">
+    <circle cx="80"  cy="310" r="7"/><circle cx="97"  cy="310" r="7"/>
+    <circle cx="114" cy="310" r="7"/><circle cx="131" cy="310" r="7"/>
+    <circle cx="148" cy="310" r="7"/><circle cx="165" cy="310" r="7"/>
+    <circle cx="182" cy="310" r="7"/><circle cx="199" cy="310" r="7"/>
+    <circle cx="216" cy="310" r="7"/><circle cx="233" cy="310" r="7"/>
+    <circle cx="250" cy="310" r="7"/>
+    <circle cx="80"  cy="328" r="7"/><circle cx="97"  cy="328" r="7"/>
+    <circle cx="114" cy="328" r="7"/><circle cx="131" cy="328" r="7"/>
+    <circle cx="148" cy="328" r="7"/><circle cx="165" cy="328" r="7"/>
+    <circle cx="182" cy="328" r="7"/><circle cx="199" cy="328" r="7"/>
+    <circle cx="216" cy="328" r="7"/><circle cx="233" cy="328" r="7"/>
+    <circle cx="250" cy="328" r="7"/>
+  </g>
+  <!-- Connector pins on right edge -->
+  <text x="283" y="296" text-anchor="end" font-size="9" fill="#fbbf24">CLK</text>
+  <text x="283" y="321" text-anchor="end" font-size="9" fill="#60a5fa">DATA</text>
+  <text x="283" y="346" text-anchor="end" font-size="9" fill="#f87171">5V</text>
+  <text x="283" y="371" text-anchor="end" font-size="9" fill="#94a3b8">GND</text>
+  <circle cx="284" cy="292" r="3" fill="#fbbf24"/>
+  <circle cx="284" cy="317" r="3" fill="#60a5fa"/>
+  <circle cx="284" cy="342" r="3" fill="#f87171"/>
+  <circle cx="284" cy="367" r="3" fill="#94a3b8"/>
+
+  <!-- ═══════════════ LED STRIP 2 ═══════════════ -->
+  <rect x="715" y="252" width="222" height="145" rx="6" fill="#14532d" stroke="#22c55e" stroke-width="2.5"/>
+  <text x="826" y="272" text-anchor="middle" font-size="12" font-weight="bold" fill="#86efac">LED STRIP 2</text>
+  <text x="826" y="286" text-anchor="middle" font-size="9" fill="#4ade80">22× APA102 · DATA=D12 · CLK=D11</text>
+  <!-- LED visualization -->
+  <g fill="#4ade80" opacity="0.75">
+    <circle cx="732" cy="310" r="7"/><circle cx="749" cy="310" r="7"/>
+    <circle cx="766" cy="310" r="7"/><circle cx="783" cy="310" r="7"/>
+    <circle cx="800" cy="310" r="7"/><circle cx="817" cy="310" r="7"/>
+    <circle cx="834" cy="310" r="7"/><circle cx="851" cy="310" r="7"/>
+    <circle cx="868" cy="310" r="7"/><circle cx="885" cy="310" r="7"/>
+    <circle cx="902" cy="310" r="7"/>
+    <circle cx="732" cy="328" r="7"/><circle cx="749" cy="328" r="7"/>
+    <circle cx="766" cy="328" r="7"/><circle cx="783" cy="328" r="7"/>
+    <circle cx="800" cy="328" r="7"/><circle cx="817" cy="328" r="7"/>
+    <circle cx="834" cy="328" r="7"/><circle cx="851" cy="328" r="7"/>
+    <circle cx="868" cy="328" r="7"/><circle cx="885" cy="328" r="7"/>
+    <circle cx="902" cy="328" r="7"/>
+  </g>
+  <!-- Connector pins on left edge -->
+  <text x="717" y="296" font-size="9" fill="#fbbf24">CLK</text>
+  <text x="717" y="321" font-size="9" fill="#60a5fa">DATA</text>
+  <text x="717" y="346" font-size="9" fill="#f87171">5V</text>
+  <text x="717" y="371" font-size="9" fill="#94a3b8">GND</text>
+  <circle cx="716" cy="292" r="3" fill="#fbbf24"/>
+  <circle cx="716" cy="317" r="3" fill="#60a5fa"/>
+  <circle cx="716" cy="342" r="3" fill="#f87171"/>
+  <circle cx="716" cy="367" r="3" fill="#94a3b8"/>
+
+  <!-- ═══════════════ BUTTON ═══════════════ -->
+  <rect x="430" y="530" width="140" height="48" rx="5" fill="#e2e8f0" stroke="#475569" stroke-width="2"/>
+  <text x="500" y="549" text-anchor="middle" font-size="12" font-weight="bold" fill="#1e293b">BUTTON</text>
+  <text x="500" y="564" text-anchor="middle" font-size="9" fill="#475569">MR5110f · active HIGH · ext. pull-down</text>
+  <!-- Button terminals -->
+  <circle cx="452" cy="530" r="4" fill="#ea580c"/>
+  <circle cx="538" cy="530" r="4" fill="#dc2626"/>
+  <!-- Terminal labels -->
+  <text x="452" y="524" text-anchor="middle" font-size="8" fill="#ea580c">D8</text>
+  <text x="538" y="524" text-anchor="middle" font-size="8" fill="#dc2626">5V</text>
+
+  <!-- ═══════════════ LEGEND ═══════════════ -->
+  <rect x="800" y="455" width="188" height="165" rx="5" fill="white" stroke="#94a3b8" stroke-width="1.5"/>
+  <text x="894" y="473" text-anchor="middle" font-size="11" font-weight="bold" fill="#1e293b">LEGEND</text>
+  <line x1="815" y1="487" x2="850" y2="487" stroke="#dc2626" stroke-width="2.5"/>
+  <text x="856" y="491" font-size="10" fill="#374151">+5V / VCC</text>
+  <line x1="815" y1="504" x2="850" y2="504" stroke="#374151" stroke-width="2.5"/>
+  <text x="856" y="508" font-size="10" fill="#374151">GND</text>
+  <line x1="815" y1="521" x2="850" y2="521" stroke="#2563eb" stroke-width="2.5"/>
+  <text x="856" y="525" font-size="10" fill="#374151">SPI Data</text>
+  <line x1="815" y1="538" x2="850" y2="538" stroke="#ca8a04" stroke-width="2.5"/>
+  <text x="856" y="542" font-size="10" fill="#374151">SPI Clock</text>
+  <line x1="815" y1="555" x2="850" y2="555" stroke="#16a34a" stroke-width="2.5"/>
+  <text x="856" y="559" font-size="10" fill="#374151">Hall signal</text>
+  <line x1="815" y1="572" x2="850" y2="572" stroke="#ea580c" stroke-width="2.5"/>
+  <text x="856" y="576" font-size="10" fill="#374151">Button signal</text>
+  <rect x="823" y="584" width="18" height="12" rx="2" fill="#fef9c3" stroke="#374151" stroke-width="1"/>
+  <text x="856" y="594" font-size="10" fill="#374151">Resistor (10kΩ)</text>
+
+  <!-- ═══════════════ NOTES ═══════════════ -->
+  <rect x="12" y="455" width="200" height="95" rx="5" fill="white" stroke="#94a3b8" stroke-width="1"/>
+  <text x="112" y="472" text-anchor="middle" font-size="10" font-weight="bold" fill="#1e293b">NOTES</text>
+  <text x="20" y="488" font-size="9" fill="#475569">· APA102: BGR colour order</text>
+  <text x="20" y="502" font-size="9" fill="#475569">· GLOBAL_BRIGHTNESS = 10/255</text>
+  <text x="20" y="516" font-size="9" fill="#475569">· Hall: POLE_PAIRS=14, ⌀100mm</text>
+  <text x="20" y="530" font-size="9" fill="#475569">· LED 5V: use ext. supply for</text>
+  <text x="20" y="542" font-size="9" fill="#475569">  full brightness (2× 22 LEDs)</text>
+
+</svg>
